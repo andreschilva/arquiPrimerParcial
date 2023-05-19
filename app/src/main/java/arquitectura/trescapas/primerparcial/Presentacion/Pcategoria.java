@@ -117,9 +117,9 @@ public class Pcategoria extends AppCompatActivity {
 
             public AdaptadorCategoriaHolder(@NonNull View itemView) {
                 super(itemView);
-                tv1 = itemView.findViewById(R.id.tvnombre);
-                tv2 = itemView.findViewById(R.id.tvDescripcion);
-                tv3 = itemView.findViewById(R.id.tvPrecio);
+                tv1 = itemView.findViewById(R.id.tvEstado);
+                tv2 = itemView.findViewById(R.id.tvCliente);
+                tv3 = itemView.findViewById(R.id.tvRepartidor);
                 btnEliminar =  itemView.findViewById(R.id.btnEliminar);
                 itemView.setOnClickListener(this);
 

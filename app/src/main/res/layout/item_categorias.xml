@@ -16,7 +16,7 @@
         android:orientation="vertical">
 
         <TextView
-            android:id="@+id/tvnombre2"
+            android:id="@+id/tvestado2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="nombre:"
@@ -34,7 +34,7 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <TextView
-            android:id="@+id/tvnombre"
+            android:id="@+id/tvEstado"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="24sp" />

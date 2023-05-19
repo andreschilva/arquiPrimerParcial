@@ -17,7 +17,7 @@
         android:orientation="vertical">
 
         <TextView
-            android:id="@+id/tvnombre2"
+            android:id="@+id/tvestado2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="nombre:"
@@ -25,7 +25,7 @@
             android:textSize="24sp" />
 
         <TextView
-            android:id="@+id/tvApellido2"
+            android:id="@+id/tvCliente2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="apellido:"
@@ -33,7 +33,7 @@
             android:textSize="24sp" />
 
         <TextView
-            android:id="@+id/tvCelular2"
+            android:id="@+id/tvRepartidor2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="celular:"
@@ -51,19 +51,19 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <TextView
-            android:id="@+id/tvnombre"
+            android:id="@+id/tvEstado"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="24sp" />
 
         <TextView
-            android:id="@+id/tvDescripcion"
+            android:id="@+id/tvCliente"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="24sp" />
 
         <TextView
-            android:id="@+id/tvPrecio"
+            android:id="@+id/tvRepartidor"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="24sp" />

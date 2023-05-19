@@ -190,10 +190,10 @@ public class Pproduto extends AppCompatActivity {
 
             public AdaptadorProductoHolder(@NonNull View itemView) {
                 super(itemView);
-                tv1 = itemView.findViewById(R.id.tvnombre);
-                tv2 = itemView.findViewById(R.id.tvDescripcion);
-                tv3 = itemView.findViewById(R.id.tvPrecio);
-                tv4 = itemView.findViewById(R.id.tvCategoria);
+                tv1 = itemView.findViewById(R.id.tvEstado);
+                tv2 = itemView.findViewById(R.id.tvCliente);
+                tv3 = itemView.findViewById(R.id.tvRepartidor);
+                tv4 = itemView.findViewById(R.id.tvFecha);
                 chCotizacion = itemView.findViewById(R.id.cBCotizacion);
                 btnEliminar =  itemView.findViewById(R.id.btnEliminar);
                 itemView.setOnClickListener(this);
