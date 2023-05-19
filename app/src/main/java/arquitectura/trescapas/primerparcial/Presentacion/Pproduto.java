@@ -48,7 +48,7 @@ public class Pproduto extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_pproduto);
         getSupportActionBar().setTitle("Productos");
-        spCategoria = findViewById(R.id.spCliente);
+        spCategoria = findViewById(R.id.spRepartidor);
         tvNumero = findViewById(R.id.tvnumero1);
 
         producto = new Nproducto(this);

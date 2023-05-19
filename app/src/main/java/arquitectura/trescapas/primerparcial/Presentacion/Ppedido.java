@@ -12,7 +12,6 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
-import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -67,7 +66,7 @@ public class Ppedido extends AppCompatActivity {
         //inicializando spinners
         spclientes = findViewById(R.id.spCliente);
         sprepartidores = findViewById(R.id.spRepartidor);
-        spestado = findViewById(R.id.spRepartidor);
+        spestado = findViewById(R.id.spEstado);
 
 
         producto = new Nproducto(this);
