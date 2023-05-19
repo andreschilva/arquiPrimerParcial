@@ -70,6 +70,9 @@ public class DBmigrations {
     public static final String PEDIDO_ESTADO = "estado";
     public static final String PEDIDO_TOTAL = "total";
     public static final String PEDIDO_FECHA = "fecha";
+    public static final String PEDIDO_CLIENTE_ID = "cliente_id";
+    public static final String PEDIDO_REPARTIDOR_ID = "repartidor_id";
+
 
 
 
@@ -79,7 +82,11 @@ public class DBmigrations {
                     + PEDIDO_ID+ " integer not null primary key autoincrement, "
                     + PEDIDO_ESTADO + " text not null, "
                     + PEDIDO_TOTAL + " float not null, "
-                    + PEDIDO_FECHA + " date not null )";
+                    + PEDIDO_FECHA + " date not null, "
+                    + PEDIDO_CLIENTE_ID + " integer not null, "
+                    + PEDIDO_REPARTIDOR_ID + " integer not null, "
+                    +"foreign key ("+PEDIDO_CLIENTE_ID+") references "+TABLA_CLIENTE+"(id), "
+                    +"foreign key ("+PEDIDO_REPARTIDOR_ID+") references "+TABLA_REPARTIDOR+"(id) )";
 
     //TABLA PEDIDO
     public static final String TABLA_DETALLE_PEDIDO = "detalle_pedidos";
