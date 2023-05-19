@@ -16,6 +16,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.net.CookieHandler;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -87,8 +88,24 @@ public class Ppedido extends AppCompatActivity {
         aP= new AdaptadorPedido();
         rv1.setAdapter(aP);
 
-        ArrayAdapter<Map<String,Object>> adapterClientes = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item,listClientes);
-        ArrayAdapter<Map<String,Object>> adapterRepartidores = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item,listRepartidores);
+        int i=0;
+        String [] arrayClientes = new String[listClientes.size()];
+
+        for (Map<String,Object> mapcliente : listClientes) {
+            arrayClientes[i] = mapcliente.get("nombre").toString();
+            i++;
+        }
+        i=0;
+        String [] arrayRepartidores = new String[listRepartidores.size()];
+
+        for (Map<String,Object> mapRepartidor : listRepartidores) {
+            arrayRepartidores[i] = mapRepartidor.get("nombre").toString();
+            i++;
+        }
+
+
+        ArrayAdapter<String> adapterClientes = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item,arrayClientes);
+        ArrayAdapter<String> adapterRepartidores = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item,arrayRepartidores);
         ArrayAdapter<String> adapterEstados = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item,arrayEstados);
 
 
@@ -104,25 +121,25 @@ public class Ppedido extends AppCompatActivity {
         long positionCliente= spclientes.getSelectedItemPosition();
         long positionRepartidores= sprepartidores.getSelectedItemPosition();
 
-        Map<String, Object> cliente = this.listClientes.get((int) positionCliente);
-        Map<String, Object> repartidor = this.listRepartidores.get((int) positionCliente);
-        String estado = this.arrayEstados[(int) positionEstado];
+        Map<String, Object> clienteSeleccionado = this.listClientes.get((int) positionCliente);
+        Map<String, Object> repartidorSeleccionado = this.listRepartidores.get((int) positionCliente);
+        String estadoSeleccionado = this.arrayEstados[(int) positionEstado];
 
         //Toast.makeText(this,  listClientes.get((int) position).get("nombre").toString(), Toast.LENGTH_SHORT).show();
         Map<String, Object> data = new HashMap<>();
-        data.put(DBmigrations.PEDIDO_ESTADO,estado);
-//        data.put(DBmigrations.PEDIDO,apellido);
-//        data.put(DBmigrations.PRODUCTO_PRECIO,celular);
-//        data.put(DBmigrations.PRODUCTO_CATEGORIAID,listClientes.get((int) position).get("id").toString());
-//
-//        if (producto.saveDatos(data)){
+        data.put(DBmigrations.PEDIDO_ESTADO,estadoSeleccionado);
+        data.put(DBmigrations.PEDIDO_FECHA,"18/05/2023");
+        data.put(DBmigrations.PEDIDO_CLIENTE_ID,clienteSeleccionado.get("id").toString());
+        data.put(DBmigrations.PEDIDO_REPARTIDOR_ID,repartidorSeleccionado.get("id").toString());
+
+        if (pedido.saveDatos(data)){
 //            listar();
 //            rv1.scrollToPosition(listProductos.size()-1);
 //            Toast.makeText(this, "Producto creado", Toast.LENGTH_SHORT).show();
-//
-//        }else {
-//            Toast.makeText(this, "Producto ya existente", Toast.LENGTH_SHORT).show();
-//        }
+
+        }else {
+            Toast.makeText(this, "Pedido ya existente", Toast.LENGTH_SHORT).show();
+        }
 
     }
 
