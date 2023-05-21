@@ -90,6 +90,7 @@ public class DBmigrations {
 
     //TABLA PEDIDO
     public static final String TABLA_DETALLE_PEDIDO = "detalle_pedidos";
+    public static final String DETALLE_PEDIDO_ID = "id";
     public static final String DETALLE_PEDIDO_PEDIDO_ID = "pedido_id";
     public static final String DETALLE_PEDIDO_PRODUCTO_ID = "producto_id";
     public static final String DETALLE_PEDIDO_CANTIDAD = "cantidad";
@@ -98,12 +99,12 @@ public class DBmigrations {
     public static final String TABLA_DETALLE_PEDIDO_CREATE =
             "create table " + TABLA_DETALLE_PEDIDO +
                     "("
+                    + DETALLE_PEDIDO_ID+ " integer not null primary key autoincrement, "
                     + DETALLE_PEDIDO_PEDIDO_ID + " integer not null, "
                     + DETALLE_PEDIDO_PRODUCTO_ID + " integer not null, "
                     + DETALLE_PEDIDO_CANTIDAD + " text not null, "
-                    + "PRIMARY KEY ("+DETALLE_PEDIDO_PEDIDO_ID+ ", "+DETALLE_PEDIDO_PRODUCTO_ID+ " ), "
-                    +"foreign key ("+DETALLE_PEDIDO_PEDIDO_ID+") references "+TABLA_PEDIDO+"(id) " +
-                    "foreign key ("+DETALLE_PEDIDO_PRODUCTO_ID+") references "+TABLA_PRODUCTO+"(id) )";
+                    +"foreign key ("+DETALLE_PEDIDO_PEDIDO_ID+") references "+TABLA_PEDIDO+"(id) "
+                    + "foreign key ("+DETALLE_PEDIDO_PRODUCTO_ID+") references "+TABLA_PRODUCTO+"(id) )";
 
 
 }

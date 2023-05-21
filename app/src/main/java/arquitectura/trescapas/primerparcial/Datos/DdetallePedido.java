@@ -22,6 +22,7 @@ public class DdetallePedido implements IDatos {
         this.db = new DBmanager(context);
         this.row = new HashMap<>();
 
+        row.put(DBmigrations.DETALLE_PEDIDO_ID,"");
         row.put(DBmigrations.DETALLE_PEDIDO_PEDIDO_ID,"");
         row.put(DBmigrations.DETALLE_PEDIDO_PRODUCTO_ID,"");
         row.put(DBmigrations.DETALLE_PEDIDO_CANTIDAD,"");
