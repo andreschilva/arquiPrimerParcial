@@ -34,7 +34,7 @@ public class Nrepartidor {
         dRepartidor.delete(id);
     }
 
-    public Drepartidor getDcategoriaById(String id) {
+    public Drepartidor getById(String id) {
         return dRepartidor.getById(id);
     }
 }

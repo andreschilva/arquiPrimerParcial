@@ -27,6 +27,9 @@ public class Dpedido implements IDatos {
         row.put(DBmigrations.PEDIDO_ESTADO,"");
         row.put(DBmigrations.PEDIDO_FECHA,"");
         row.put(DBmigrations.PEDIDO_TOTAL,"");
+        row.put(DBmigrations.PEDIDO_CLIENTE_ID,"");
+        row.put(DBmigrations.PEDIDO_REPARTIDOR_ID,"");
+
 
     }
 

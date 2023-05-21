@@ -33,7 +33,7 @@ public class Ncliente {
         dCliente.delete(id);
     }
 
-    public Dcliente getDcategoriaById(String id) {
+    public Dcliente getById(String id) {
         return dCliente.getById(id);
     }
 

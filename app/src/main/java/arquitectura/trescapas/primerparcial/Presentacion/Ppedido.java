@@ -1,22 +1,28 @@
 package arquitectura.trescapas.primerparcial.Presentacion;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.app.DatePickerDialog;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.CheckBox;
-import android.widget.CompoundButton;
+import android.widget.DatePicker;
+import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.net.CookieHandler;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -27,6 +33,7 @@ import arquitectura.trescapas.primerparcial.Negocio.Ncliente;
 import arquitectura.trescapas.primerparcial.Negocio.Npedido;
 import arquitectura.trescapas.primerparcial.Negocio.Nproducto;
 import arquitectura.trescapas.primerparcial.Negocio.Nrepartidor;
+import arquitectura.trescapas.primerparcial.PdetallePedido;
 import arquitectura.trescapas.primerparcial.R;
 
 public class Ppedido extends AppCompatActivity {
@@ -50,11 +57,6 @@ public class Ppedido extends AppCompatActivity {
     List<Map<String,Object>> listProductosSeleccionados;
     String [] arrayEstados = {"En proceso","entregado"};
 
-    //spiners
-    Spinner spestado;
-    Spinner spclientes;
-    Spinner sprepartidores;
-
 
     int pos;
 
@@ -62,12 +64,8 @@ public class Ppedido extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_ppedido);
-        getSupportActionBar().setTitle("Pedidos");
+        //getSupportActionBar().setTitle("Pedidos");
 
-        //inicializando spinners
-        spclientes = findViewById(R.id.spCliente);
-        sprepartidores = findViewById(R.id.spRepartidor);
-        spestado = findViewById(R.id.spEstado);
 
 
         producto = new Nproducto(this);
@@ -79,6 +77,7 @@ public class Ppedido extends AppCompatActivity {
         listProductos = producto.getDatos();
         listClientes= cliente.getDatos();
         listRepartidores = repartidor.getDatos();
+        listPedidos = pedido.getDatos();
         listProductosSeleccionados = new ArrayList<>();
 
 
@@ -87,6 +86,34 @@ public class Ppedido extends AppCompatActivity {
         rv1.setLayoutManager(l);
         aP= new AdaptadorPedido();
         rv1.setAdapter(aP);
+
+    }
+
+    public void agregarPedido(View v) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage("Crear Pedido");
+        View selector = getLayoutInflater().inflate(R.layout.modalcrearpedido,null);
+        builder.setView(selector);
+
+        Spinner sp1 = selector.findViewById(R.id.spEstado);
+        Spinner sp2 = selector.findViewById(R.id.spCliente);
+        Spinner sp3 = selector.findViewById(R.id.spRepartidor);
+        EditText ed1Fecha = selector.findViewById(R.id.edFecha);
+        EditText ed2Total = selector.findViewById(R.id.edTotal);
+        ImageButton btnCalendario = selector.findViewById(R.id.btnCalendario);
+
+        btnCalendario.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                DatePickerDialog d = new DatePickerDialog(Ppedido.this, new DatePickerDialog.OnDateSetListener() {
+                    @Override
+                    public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
+                        ed1Fecha.setText(dayOfMonth+"/"+month+"/"+year);
+                    }
+                },2023,0,1);
+                d.show();
+            }
+        });
 
         int i=0;
         String [] arrayClientes = new String[listClientes.size()];
@@ -108,40 +135,54 @@ public class Ppedido extends AppCompatActivity {
         ArrayAdapter<String> adapterRepartidores = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item,arrayRepartidores);
         ArrayAdapter<String> adapterEstados = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item,arrayEstados);
 
+        sp1.setAdapter(adapterEstados);
+        sp2.setAdapter(adapterClientes);
+        sp3.setAdapter(adapterRepartidores);
 
-        spclientes.setAdapter(adapterClientes);
-        sprepartidores.setAdapter(adapterRepartidores);
-        spestado.setAdapter(adapterEstados);
+        builder.setPositiveButton("crear", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                long positionEstado= sp1.getSelectedItemPosition();
+                long positionCliente= sp2.getSelectedItemPosition();
+                long positionRepartidor= sp3.getSelectedItemPosition();
 
+                Map<String, Object> clienteSeleccionado = listClientes.get((int) positionCliente);
+                Map<String, Object> repartidorSeleccionado = listRepartidores.get((int) positionRepartidor);
+                String estadoSeleccionado = arrayEstados[(int) positionEstado];
+                String fecha = ed1Fecha.getText().toString();
+                String total = ed2Total.getText().toString();
+
+
+                //Toast.makeText(this,  listClientes.get((int) position).get("nombre").toString(), Toast.LENGTH_SHORT).show();
+                Map<String, Object> data = new HashMap<>();
+                data.put(DBmigrations.PEDIDO_ESTADO,estadoSeleccionado);
+                data.put(DBmigrations.PEDIDO_FECHA,fecha);
+                data.put(DBmigrations.PEDIDO_TOTAL,total);
+                data.put(DBmigrations.PEDIDO_CLIENTE_ID,clienteSeleccionado.get("id").toString());
+                data.put(DBmigrations.PEDIDO_REPARTIDOR_ID,repartidorSeleccionado.get("id").toString());
+
+                if (pedido.saveDatos(data)){
+                    listar();
+                    rv1.scrollToPosition(listPedidos.size()-1);
+                    Toast.makeText(Ppedido.this, "Pedido creado", Toast.LENGTH_SHORT).show();
+
+                }else {
+                    Toast.makeText(Ppedido.this, "Pedido ya existente", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+        builder.setNegativeButton("cancelar", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+            }
+        });
+
+        builder.create().show();
 
     }
 
-    public void agregar(View v) {
-        long positionEstado= spestado.getSelectedItemPosition();
-        long positionCliente= spclientes.getSelectedItemPosition();
-        long positionRepartidores= sprepartidores.getSelectedItemPosition();
-
-        Map<String, Object> clienteSeleccionado = this.listClientes.get((int) positionCliente);
-        Map<String, Object> repartidorSeleccionado = this.listRepartidores.get((int) positionCliente);
-        String estadoSeleccionado = this.arrayEstados[(int) positionEstado];
-
-        //Toast.makeText(this,  listClientes.get((int) position).get("nombre").toString(), Toast.LENGTH_SHORT).show();
-        Map<String, Object> data = new HashMap<>();
-        data.put(DBmigrations.PEDIDO_ESTADO,estadoSeleccionado);
-        data.put(DBmigrations.PEDIDO_FECHA,"18/05/2023");
-        data.put(DBmigrations.PEDIDO_CLIENTE_ID,clienteSeleccionado.get("id").toString());
-        data.put(DBmigrations.PEDIDO_REPARTIDOR_ID,repartidorSeleccionado.get("id").toString());
-
-        if (pedido.saveDatos(data)){
-//            listar();
-//            rv1.scrollToPosition(listProductos.size()-1);
-//            Toast.makeText(this, "Producto creado", Toast.LENGTH_SHORT).show();
-
-        }else {
-            Toast.makeText(this, "Pedido ya existente", Toast.LENGTH_SHORT).show();
-        }
-
-    }
 
 //    public void mostrar(int position) {
 //        etNombre.setText(listProductos.get(position).get(DBmigrations.PRODUCTO_NOMBRE).toString());
@@ -174,7 +215,7 @@ public class Ppedido extends AppCompatActivity {
 
     }
     public void listar() {
-        this.listProductos = producto.getDatos();
+        this.listPedidos = pedido.getDatos();
         aP.notifyDataSetChanged();
     }
 
@@ -184,7 +225,7 @@ public class Ppedido extends AppCompatActivity {
         @NonNull
         @Override
         public AdaptadorPedido.AdaptadorPedidoHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-            return new AdaptadorPedido.AdaptadorPedidoHolder(getLayoutInflater().inflate(R.layout.item_producto,parent,false));
+            return new AdaptadorPedido.AdaptadorPedidoHolder(getLayoutInflater().inflate(R.layout.item_pedido,parent,false));
         }
 
         @Override
@@ -197,14 +238,13 @@ public class Ppedido extends AppCompatActivity {
 
         @Override
         public int getItemCount() {
-            return listProductos.size();
+            return listPedidos.size();
         }
 
         public class AdaptadorPedidoHolder extends RecyclerView.ViewHolder  implements View.OnClickListener {
 
-            TextView tv1, tv2, tv3,tv4;
-            CheckBox chCotizacion;
-            Button btnEliminar;
+            TextView tv1, tv2, tv3,tv4, tv5;
+            Button btnEliminar, btnDetalles;
 
             public AdaptadorPedidoHolder(@NonNull View itemView) {
                 super(itemView);
@@ -212,42 +252,56 @@ public class Ppedido extends AppCompatActivity {
                 tv2 = itemView.findViewById(R.id.tvCliente);
                 tv3 = itemView.findViewById(R.id.tvRepartidor);
                 tv4 = itemView.findViewById(R.id.tvFecha);
-                chCotizacion = itemView.findViewById(R.id.cBCotizacion);
+                tv5 = itemView.findViewById(R.id.tvTotal);
+
                 btnEliminar =  itemView.findViewById(R.id.btnEliminar);
                 itemView.setOnClickListener(this);
 
-                btnEliminar.setOnClickListener(new View.OnClickListener() {
+//                btnEliminar.setOnClickListener(new View.OnClickListener() {
+//                    @Override
+//                    public void onClick(View v) {
+//                        onClickEliminar();
+//                    }
+//                });
+
+                btnDetalles = itemView.findViewById(R.id.btnDetalles);
+                btnDetalles.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        onClickEliminar();
+                        onClickDetalles();
                     }
                 });
 
-                chCotizacion.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-                    @Override
-                    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                        onCheckedCotizacion();
-                    }
-                });
 
             }
 
-            private void onCheckedCotizacion() {
-                if (chCotizacion.isChecked())
-                    listProductosSeleccionados.add(listProductos.get(getLayoutPosition()));
-                else {
-                    listProductosSeleccionados.remove(listProductos.get(getLayoutPosition()));
-                }
+            private void onClickDetalles() {
+                Intent intento = new Intent(Ppedido.this, PdetallePedido.class);
+                int position = getLayoutPosition();
+                Map<String,Object> pedidoSeleccionado = listPedidos.get(position);
+                Bundle bundle = new Bundle();
+                bundle.putSerializable("pedido", (Serializable) pedidoSeleccionado);
+                intento.putExtras(bundle);
+
+                startActivity(intento);
             }
+
 
             public void imprimir(int position) {
-                listProductos = producto.getDatos();
-                tv1.setText(listProductos.get(position).get("nombre").toString());
-                tv2.setText(listProductos.get(position).get("descripcion").toString());
-                tv3.setText(listProductos.get(position).get("precio").toString());
-                String idcategoria =listProductos.get(position).get("categoria_id").toString();
-                String nombreCategoria= cliente.getDcategoriaById(idcategoria).row().get("nombre").toString();
-                tv4.setText(nombreCategoria);
+                listPedidos = pedido.getDatos();
+                tv1.setText(listPedidos.get(position).get(DBmigrations.PEDIDO_ESTADO).toString());
+
+                String idcliente =listPedidos.get(position).get(DBmigrations.PEDIDO_CLIENTE_ID).toString();
+                String nombreCliente= cliente.getById(idcliente).row().get("nombre").toString();
+                tv2.setText(nombreCliente);
+
+                String idRepartidor =listPedidos.get(position).get(DBmigrations.PEDIDO_REPARTIDOR_ID).toString();
+                String nombreRepartidor= repartidor.getById(idRepartidor).row().get("nombre").toString();
+                tv3.setText(nombreRepartidor);
+
+                tv4.setText(listPedidos.get(position).get(DBmigrations.PEDIDO_FECHA).toString());
+                tv5.setText(listPedidos.get(position).get(DBmigrations.PEDIDO_TOTAL).toString());
+
             }
 
 
@@ -257,15 +311,15 @@ public class Ppedido extends AppCompatActivity {
                 //mostrar(position);
             }
 
-            private void onClickEliminar() {
-                int position = getLayoutPosition();
-                if (position != RecyclerView.NO_POSITION) {
-                    String id = listProductos.get(getLayoutPosition()).get("id").toString();
-                    producto.delete(id);
-                    listar();
-                    Toast.makeText(Ppedido.this, "eliminado", Toast.LENGTH_SHORT).show();
-                }
-            }
+//            private void onClickEliminar() {
+//                int position = getLayoutPosition();
+//                if (position != RecyclerView.NO_POSITION) {
+//                    String id = listProductos.get(getLayoutPosition()).get("id").toString();
+//                    producto.delete(id);
+//                    listar();
+//                    Toast.makeText(Ppedido.this, "eliminado", Toast.LENGTH_SHORT).show();
+//                }
+//            }
         }
     }
 }
