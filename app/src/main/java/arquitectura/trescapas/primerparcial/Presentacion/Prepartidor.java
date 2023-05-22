@@ -34,7 +34,7 @@ public class Prepartidor extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_prepartidor);
-        getSupportActionBar().setTitle("Repartidores");
+       // getSupportActionBar().setTitle("Repartidores");
 
         repartidor = new Nrepartidor(this);
         list = repartidor.getDatos();

@@ -33,7 +33,7 @@ public class Pcliente extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_pcliente);
-        getSupportActionBar().setTitle("Clientes");
+        //getSupportActionBar().setTitle("Clientes");
 
         cliente = new Ncliente(this);
         list = cliente.getDatos();

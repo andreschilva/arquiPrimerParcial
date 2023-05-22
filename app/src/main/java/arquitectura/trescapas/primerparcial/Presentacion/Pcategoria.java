@@ -32,7 +32,7 @@ public class Pcategoria extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_pcategoria);
-        getSupportActionBar().setTitle("Categorias");
+        //getSupportActionBar().setTitle("Categorias");
 
         categoria = new Ncategoria(this);
         list = categoria.getDatos();

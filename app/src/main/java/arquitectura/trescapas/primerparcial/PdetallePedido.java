@@ -78,7 +78,7 @@ public class PdetallePedido extends AppCompatActivity {
         AdaptadorProducto aD= new AdaptadorProducto();
         rv1.setAdapter(aD);
 
-
+        AlertDialog dialog = builder.create();
         btnAgregar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -90,19 +90,19 @@ public class PdetallePedido extends AppCompatActivity {
                     mapDetallePedido.put(DBmigrations.DETALLE_PEDIDO_CANTIDAD,productoSeleccionado.get("cantidad"));
                     detallePedido.saveDatos(mapDetallePedido);
                 }
+                dialog.dismiss();
             }
         });
 
         btnCancelar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                dialog.dismiss();
             }
         });
 
 
-
-        builder.create().show();
+        dialog.show();
     }
 
     private class AdaptadorProducto extends RecyclerView.Adapter<AdaptadorProducto.AdaptadorProductoHolder> {
