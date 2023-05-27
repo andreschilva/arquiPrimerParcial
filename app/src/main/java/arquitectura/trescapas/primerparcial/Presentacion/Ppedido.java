@@ -46,9 +46,6 @@ public class Ppedido extends AppCompatActivity {
     Ncliente cliente;
     Nrepartidor repartidor;
 
-    //tabla intermedia
-
-
     //listas
     List<Map<String,Object>> listProductos;
     List<Map<String,Object>> listPedidos;

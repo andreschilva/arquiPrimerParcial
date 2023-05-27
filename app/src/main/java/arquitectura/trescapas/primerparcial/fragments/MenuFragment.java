@@ -36,7 +36,11 @@ public class MenuFragment extends Fragment {
         cardProducto = view.findViewById(R.id.cardProducto);
         cardPedido = view.findViewById(R.id.cardPedido);
         cardSalir = view.findViewById(R.id.cardSalir);
+        vistas();
 
+    }
+
+    private void vistas() {
         cardCliente.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -85,7 +89,6 @@ public class MenuFragment extends Fragment {
                 }
             }
         });
-
     }
 
     @Override

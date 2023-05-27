@@ -1,114 +1,151 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_margin="8dp"
-    android:background="#F0F8FF"
-    android:orientation="horizontal">
+    android:layout_margin="15dp"
+    android:layout_weight="1"
+    android:foreground="?selectableItemBackground"
+    app:cardCornerRadius="10dp"
+    app:cardElevation="6dp"
+    app:layout_rowWeight="1">
 
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/tvestado2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="nombre:"
-            android:textColor="#3949AB"
-            android:textSize="24sp" />
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
         <TextView
-            android:id="@+id/tvCliente2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Descripcion:"
-            android:textColor="#3949AB"
-            android:textSize="24sp" />
+            android:id="@+id/tvNombre"
+            android:layout_width="0dp"
+            android:layout_height="29dp"
+            android:layout_marginStart="3dp"
+            android:layout_marginLeft="3dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="3dp"
+            android:layout_marginRight="3dp"
+            android:textSize="24sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toEndOf="@+id/iv1"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
-            android:id="@+id/tvRepartidor2"
-            android:layout_width="wrap_content"
+            android:id="@+id/tvDescripcion"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="Precio:"
-            android:textColor="#3949AB"
-            android:textSize="24sp" />
+            android:layout_marginStart="3dp"
+            android:layout_marginLeft="3dp"
+            android:layout_marginTop="4dp"
+            android:layout_marginEnd="3dp"
+            android:layout_marginRight="3dp"
+            android:textSize="24sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toEndOf="@+id/iv1"
+            app:layout_constraintTop_toBottomOf="@+id/tvNombre" />
 
         <TextView
-            android:id="@+id/tvFecha2"
-            android:layout_width="wrap_content"
+            android:id="@+id/tvPrecio"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="Categoria:"
-            android:textColor="#3949AB"
-            android:textSize="24sp" />
-
-    </LinearLayout>
-
-    <LinearLayout
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:orientation="vertical">
+            android:layout_marginStart="3dp"
+            android:layout_marginLeft="3dp"
+            android:layout_marginTop="4dp"
+            android:layout_marginEnd="3dp"
+            android:layout_marginRight="3dp"
+            android:textSize="24sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toEndOf="@+id/iv1"
+            app:layout_constraintTop_toBottomOf="@+id/tvDescripcion" />
 
         <TextView
-            android:id="@+id/tvEstado"
-            android:layout_width="wrap_content"
+            android:id="@+id/tvCategoria"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:textSize="24sp" />
+            android:layout_marginStart="3dp"
+            android:layout_marginLeft="3dp"
+            android:layout_marginTop="4dp"
+            android:layout_marginEnd="3dp"
+            android:layout_marginRight="3dp"
+            android:textSize="24sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toEndOf="@+id/iv1"
+            app:layout_constraintTop_toBottomOf="@+id/tvPrecio" />
 
-        <TextView
-            android:id="@+id/tvCliente"
-            android:layout_width="wrap_content"
+        <Button
+            android:id="@+id/btnEdit"
+            android:layout_width="362dp"
             android:layout_height="wrap_content"
-            android:textSize="24sp" />
-
-        <TextView
-            android:id="@+id/tvRepartidor"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="24sp" />
-
-        <TextView
-            android:id="@+id/tvFecha"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="24sp" />
-
-    </LinearLayout>
-
-    <FrameLayout
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:layout_weight="1">
-
-        <EditText
-            android:id="@+id/edCantidad"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom"
-            android:ems="10"
-            android:inputType="number" />
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="8dp"
+            android:text="Edit"
+            android:textSize="12sp"
+            app:backgroundTint="@color/amarillo_700"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.4"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/iv1" />
 
         <Button
             android:id="@+id/btnEliminar"
-            android:layout_width="wrap_content"
+            android:layout_width="362dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:text="Eliminar"
-            android:textSize="10sp" />
+            android:textSize="12sp"
+            app:backgroundTint="@color/amarillo_700"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.4"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/btnEdit"
+            app:layout_constraintVertical_bias="0.0" />
+
+        <ImageView
+            android:id="@+id/iv1"
+            android:layout_width="129dp"
+            android:layout_height="166dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginTop="8dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:srcCompat="@drawable/ic_baseline_person_24" />
 
         <CheckBox
             android:id="@+id/cBCotizacion"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="right|top"
-            android:text="Cotizar" />
+            android:layout_width="102dp"
+            android:layout_height="22dp"
+            android:layout_marginStart="12dp"
+            android:layout_marginLeft="12dp"
+            android:layout_marginTop="4dp"
+            android:text="Cotizacion"
+            app:layout_constraintBottom_toBottomOf="@+id/iv1"
+            app:layout_constraintEnd_toStartOf="@+id/edCantidad"
+            app:layout_constraintStart_toEndOf="@+id/iv1"
+            app:layout_constraintTop_toBottomOf="@+id/tvCategoria"
+            app:layout_constraintVertical_bias="0.0" />
 
+        <EditText
+            android:id="@+id/edCantidad"
+            android:layout_width="106dp"
+            android:layout_height="31dp"
+            android:layout_marginTop="4dp"
+            android:layout_marginEnd="4dp"
+            android:layout_marginRight="4dp"
+            android:ems="10"
+            android:hint="cantidad"
+            android:inputType="number"
+            android:textSize="10sp"
+            app:layout_constraintBottom_toBottomOf="@+id/iv1"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tvCategoria"
+            app:layout_constraintVertical_bias="0.333" />
 
-    </FrameLayout>
-</LinearLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.cardview.widget.CardView>

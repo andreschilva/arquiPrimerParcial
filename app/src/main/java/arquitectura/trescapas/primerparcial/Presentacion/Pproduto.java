@@ -1,20 +1,29 @@
 package arquitectura.trescapas.primerparcial.Presentacion;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.app.DatePickerDialog;
+import android.app.Dialog;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
+import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -30,15 +39,17 @@ import arquitectura.trescapas.primerparcial.Negocio.Nproducto;
 import arquitectura.trescapas.primerparcial.R;
 
 public class Pproduto extends AppCompatActivity {
-
-    Spinner spCategoria;
-    EditText etNombre, etDescripcion, etPrecio;
+    final int CAPTURA_IMAGEN = 1;
     RecyclerView rv1;
+    View selector2 = getLayoutInflater().inflate(R.layout.modal_crear_producto,null);
+    final ImageButton btnFotoP = selector2.findViewById(R.id.imageButton);
     AdaptadorProducto aP;
     Nproducto producto;
     Ncategoria categoria;
     List<Map<String,Object>> listProductos;
     List<Map<String,Object>> lisCategorias;
+
+    //Intent intent;
 
     List<Map<String,Object>> listCotizacion;
     TextView  tvNumero;
@@ -47,8 +58,7 @@ public class Pproduto extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_pproduto);
-        //getSupportActionBar().setTitle("Productos");
-        spCategoria = findViewById(R.id.spRepartidor);
+
         tvNumero = findViewById(R.id.tvnumero1);
 
         producto = new Nproducto(this);
@@ -56,75 +66,183 @@ public class Pproduto extends AppCompatActivity {
         listProductos = producto.getDatos();
         lisCategorias= categoria.getDatos();
         listCotizacion = new ArrayList<>();
-        etNombre = findViewById(R.id.editNombre);
-        etDescripcion = findViewById(R.id.editDescripcion);
-        etPrecio = findViewById(R.id.editPrecio);
+
         rv1 = findViewById(R.id.rv1);
 
         LinearLayoutManager l=new LinearLayoutManager(this);
         rv1.setLayoutManager(l);
         aP= new AdaptadorProducto();
         rv1.setAdapter(aP);
-        ArrayAdapter<Map<String,Object>> categorias = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item,lisCategorias);
-        spCategoria.setAdapter(categorias);
 
+        //btnFotoP = findViewById(R.id.imgb);
+
+        btnFotoP.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                startActivityForResult(intent,CAPTURA_IMAGEN);
+
+            }
+
+        });
     }
 
-    public void agregar(View v) {
-        String nombre= etNombre.getText().toString();
-        String apellido=  etDescripcion.getText().toString();
-        String celular= etPrecio.getText().toString();
-        long position = spCategoria.getSelectedItemId();
-        //Toast.makeText(this,  lisCategorias.get((int) position).get("nombre").toString(), Toast.LENGTH_SHORT).show();
-        Map<String, Object> data = new HashMap<>();
 
-        data.put(DBmigrations.PRODUCTO_NOMBRE,nombre);
-        data.put(DBmigrations.PRODUCTO_DESCRIPCION,apellido);
-        data.put(DBmigrations.PRODUCTO_PRECIO,celular);
-        data.put(DBmigrations.PRODUCTO_CATEGORIAID,lisCategorias.get((int) position).get("id").toString());
+    public void agregarProducto(View v) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage("Crear Producto");
+        View selector = getLayoutInflater().inflate(R.layout.modal_crear_producto,null);
+        builder.setView(selector);
 
 
+        Spinner spCategoria = selector.findViewById(R.id.spCategoriaP);
+        EditText edNombre = selector.findViewById(R.id.editNombreP);
+        EditText edDescripcion = selector.findViewById(R.id.editDescripcionP);
+        EditText edPrecio = selector.findViewById(R.id.editPrecioP);
+        ImageButton btnFoto = selector.findViewById(R.id.imageButton);
 
-        if (producto.saveDatos(data)){
-            listar();
-            rv1.scrollToPosition(listProductos.size()-1);
-            Toast.makeText(this, "Producto creado", Toast.LENGTH_SHORT).show();
+//        btnFoto.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+//                startActivityForResult(intent,CAPTURA_IMAGEN);
+//
+//            }
+//
+//        });
 
-        }else {
-            Toast.makeText(this, "Producto ya existente", Toast.LENGTH_SHORT).show();
+        int i=0;
+        String [] arrayCategorias = new String[lisCategorias.size()];
+
+        for (Map<String,Object> mapCategoria : lisCategorias) {
+            arrayCategorias[i] = mapCategoria.get("nombre").toString();
+            i++;
         }
 
+
+
+        ArrayAdapter<String> adapterCategorias = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item,arrayCategorias);
+        spCategoria.setAdapter(adapterCategorias);
+
+
+        builder.setPositiveButton("crear", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+                String nombre= edNombre.getText().toString();
+                String descripcion=  edDescripcion.getText().toString();
+                String precio= edPrecio.getText().toString();
+                long positionCategoria= spCategoria.getSelectedItemPosition();
+                Map<String, Object> categoriaSeleccionada = lisCategorias.get((int) positionCategoria);
+
+
+                //Toast.makeText(this,  lisCategorias.get((int) position).get("nombre").toString(), Toast.LENGTH_SHORT).show();
+
+                Map<String, Object> data = new HashMap<>();
+
+                data.put(DBmigrations.PRODUCTO_NOMBRE,nombre);
+                data.put(DBmigrations.PRODUCTO_DESCRIPCION,descripcion);
+                data.put(DBmigrations.PRODUCTO_PRECIO,precio);
+                data.put(DBmigrations.PRODUCTO_CATEGORIAID,categoriaSeleccionada.get("id"));
+
+
+                if (producto.saveDatos(data)){
+                    listar();
+                    rv1.scrollToPosition(listProductos.size()-1);
+                    Toast.makeText(Pproduto.this, "Producto creado", Toast.LENGTH_SHORT).show();
+
+                }else {
+                    Toast.makeText(Pproduto.this, "Producto ya existente", Toast.LENGTH_SHORT).show();
+                }
+
+            }
+        });
+
+        builder.setNegativeButton("cancelar", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+            }
+        });
+
+        Dialog dialogo = builder.create();
+        dialogo.show();
+
     }
+
+    public void cargarFoto(View v) {
+//        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+//        startActivityForResult(intent,CAPTURA_IMAGEN);
+    }
+
+
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode==CAPTURA_IMAGEN && resultCode==RESULT_OK)
+        {
+            Bundle extras = data.getExtras();
+            Bitmap bitmap1 = (Bitmap)extras.get("data");
+            btnFotoP.setImageBitmap(bitmap1);
+        }
+    }
+
+    //    public void agregar(View v) {
+//        String nombre= etNombre.getText().toString();
+//        String apellido=  etDescripcion.getText().toString();
+//        String celular= etPrecio.getText().toString();
+//        long position = spCategoria.getSelectedItemId();
+//        //Toast.makeText(this,  lisCategorias.get((int) position).get("nombre").toString(), Toast.LENGTH_SHORT).show();
+//        Map<String, Object> data = new HashMap<>();
+//
+//        data.put(DBmigrations.PRODUCTO_NOMBRE,nombre);
+//        data.put(DBmigrations.PRODUCTO_DESCRIPCION,apellido);
+//        data.put(DBmigrations.PRODUCTO_PRECIO,celular);
+//        data.put(DBmigrations.PRODUCTO_CATEGORIAID,lisCategorias.get((int) position).get("id").toString());
+//
+//
+//
+//        if (producto.saveDatos(data)){
+//            listar();
+//            rv1.scrollToPosition(listProductos.size()-1);
+//            Toast.makeText(this, "Producto creado", Toast.LENGTH_SHORT).show();
+//
+//        }else {
+//            Toast.makeText(this, "Producto ya existente", Toast.LENGTH_SHORT).show();
+//        }
+//
+//    }
 
     public void mostrar(int position) {
-        etNombre.setText(listProductos.get(position).get(DBmigrations.PRODUCTO_NOMBRE).toString());
-        etDescripcion.setText(listProductos.get(position).get(DBmigrations.PRODUCTO_DESCRIPCION).toString());
-        etPrecio.setText(listProductos.get(position).get(DBmigrations.PRODUCTO_PRECIO).toString());
-        String idcategoria =listProductos.get(position).get(DBmigrations.PRODUCTO_CATEGORIAID).toString();
-        //String nombreCategoria= categoria.getDcategoriaById(idcategoria).row();
-        int posCategoria = lisCategorias.indexOf(categoria.getDcategoriaById(idcategoria).row());
-        spCategoria.setSelection(posCategoria);
-        //Toast.makeText(this,  posCategoria, Toast.LENGTH_SHORT).show();
-        this.pos = position;
+//        etNombre.setText(listProductos.get(position).get(DBmigrations.PRODUCTO_NOMBRE).toString());
+//        etDescripcion.setText(listProductos.get(position).get(DBmigrations.PRODUCTO_DESCRIPCION).toString());
+//        etPrecio.setText(listProductos.get(position).get(DBmigrations.PRODUCTO_PRECIO).toString());
+//        String idcategoria =listProductos.get(position).get(DBmigrations.PRODUCTO_CATEGORIAID).toString();
+//        //String nombreCategoria= categoria.getDcategoriaById(idcategoria).row();
+//        int posCategoria = lisCategorias.indexOf(categoria.getDcategoriaById(idcategoria).row());
+//        spCategoria.setSelection(posCategoria);
+//        //Toast.makeText(this,  posCategoria, Toast.LENGTH_SHORT).show();
+//        this.pos = position;
     }
-    public void actualizar(View v) {
-        String nombre= etNombre.getText().toString();
-        String apellido=  etDescripcion.getText().toString();
-        String celular= etPrecio.getText().toString();
-        long position = spCategoria.getSelectedItemId();
-        String id = listProductos.get(this.pos).get("id").toString();
-
-
-        Map<String, Object> data = new HashMap<>();
-        data.put(DBmigrations.PRODUCTO_ID,id);
-        data.put(DBmigrations.PRODUCTO_NOMBRE,nombre);
-        data.put(DBmigrations.PRODUCTO_DESCRIPCION,apellido);
-        data.put(DBmigrations.PRODUCTO_PRECIO,celular);
-        data.put(DBmigrations.PRODUCTO_CATEGORIAID,lisCategorias.get((int)position).get("id").toString());
-        producto.updateDatos(data);
-        listar();
-
-    }
+//    public void actualizar(View v) {
+//        String nombre= etNombre.getText().toString();
+//        String apellido=  etDescripcion.getText().toString();
+//        String celular= etPrecio.getText().toString();
+//        long position = spCategoria.getSelectedItemId();
+//        String id = listProductos.get(this.pos).get("id").toString();
+//
+//
+//        Map<String, Object> data = new HashMap<>();
+//        data.put(DBmigrations.PRODUCTO_ID,id);
+//        data.put(DBmigrations.PRODUCTO_NOMBRE,nombre);
+//        data.put(DBmigrations.PRODUCTO_DESCRIPCION,apellido);
+//        data.put(DBmigrations.PRODUCTO_PRECIO,celular);
+//        data.put(DBmigrations.PRODUCTO_CATEGORIAID,lisCategorias.get((int)position).get("id").toString());
+//        producto.updateDatos(data);
+//        listar();
+//
+//    }
     public void listar() {
         this.listProductos = producto.getDatos();
         aP.notifyDataSetChanged();
@@ -190,10 +308,10 @@ public class Pproduto extends AppCompatActivity {
 
             public AdaptadorProductoHolder(@NonNull View itemView) {
                 super(itemView);
-                tv1 = itemView.findViewById(R.id.tvEstado);
-                tv2 = itemView.findViewById(R.id.tvCliente);
-                tv3 = itemView.findViewById(R.id.tvRepartidor);
-                tv4 = itemView.findViewById(R.id.tvFecha);
+                tv1 = itemView.findViewById(R.id.tvNombre);
+                tv2 = itemView.findViewById(R.id.tvDescripcion);
+                tv3 = itemView.findViewById(R.id.tvPrecio);
+                tv4 = itemView.findViewById(R.id.tvCategoria);
                 chCotizacion = itemView.findViewById(R.id.cBCotizacion);
                 btnEliminar =  itemView.findViewById(R.id.btnEliminar);
                 itemView.setOnClickListener(this);
