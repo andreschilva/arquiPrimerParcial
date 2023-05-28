@@ -41,15 +41,13 @@ import arquitectura.trescapas.primerparcial.R;
 public class Pproduto extends AppCompatActivity {
     final int CAPTURA_IMAGEN = 1;
     RecyclerView rv1;
-    View selector2 = getLayoutInflater().inflate(R.layout.modal_crear_producto,null);
-    final ImageButton btnFotoP = selector2.findViewById(R.id.imageButton);
     AdaptadorProducto aP;
     Nproducto producto;
     Ncategoria categoria;
     List<Map<String,Object>> listProductos;
     List<Map<String,Object>> lisCategorias;
 
-    //Intent intent;
+    ImageButton btnFoto;
 
     List<Map<String,Object>> listCotizacion;
     TextView  tvNumero;
@@ -74,19 +72,7 @@ public class Pproduto extends AppCompatActivity {
         aP= new AdaptadorProducto();
         rv1.setAdapter(aP);
 
-        //btnFotoP = findViewById(R.id.imgb);
-
-        btnFotoP.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                startActivityForResult(intent,CAPTURA_IMAGEN);
-
-            }
-
-        });
     }
-
 
     public void agregarProducto(View v) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -99,17 +85,17 @@ public class Pproduto extends AppCompatActivity {
         EditText edNombre = selector.findViewById(R.id.editNombreP);
         EditText edDescripcion = selector.findViewById(R.id.editDescripcionP);
         EditText edPrecio = selector.findViewById(R.id.editPrecioP);
-        ImageButton btnFoto = selector.findViewById(R.id.imageButton);
+        btnFoto = selector.findViewById(R.id.imageButton);
 
-//        btnFoto.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-//                startActivityForResult(intent,CAPTURA_IMAGEN);
-//
-//            }
-//
-//        });
+        btnFoto.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                startActivityForResult(intent,CAPTURA_IMAGEN);
+
+            }
+
+        });
 
         int i=0;
         String [] arrayCategorias = new String[lisCategorias.size()];
@@ -118,7 +104,6 @@ public class Pproduto extends AppCompatActivity {
             arrayCategorias[i] = mapCategoria.get("nombre").toString();
             i++;
         }
-
 
 
         ArrayAdapter<String> adapterCategorias = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item,arrayCategorias);
@@ -170,13 +155,6 @@ public class Pproduto extends AppCompatActivity {
 
     }
 
-    public void cargarFoto(View v) {
-//        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-//        startActivityForResult(intent,CAPTURA_IMAGEN);
-    }
-
-
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -184,7 +162,7 @@ public class Pproduto extends AppCompatActivity {
         {
             Bundle extras = data.getExtras();
             Bitmap bitmap1 = (Bitmap)extras.get("data");
-            btnFotoP.setImageBitmap(bitmap1);
+            btnFoto.setImageBitmap(bitmap1);
         }
     }
 
