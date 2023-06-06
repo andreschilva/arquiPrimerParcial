@@ -8,6 +8,7 @@ public class DBmigrations {
     public static final String CLIENTE_NOMBRE = "nombre";
     public static final String CLIENTE_APELLIDO = "apellido";
     public static final String CLIENTE_CELULAR = "celular";
+    public static final String CLIENTE_UBICACION = "ubicacion";
 
     public static final String TABLA_CLIENTE_CREATE =
             "create table " + TABLA_CLIENTE +
@@ -15,7 +16,8 @@ public class DBmigrations {
                     + CLIENTE_ID + " integer not null primary key autoincrement, "
                     + CLIENTE_NOMBRE + " text not null, "
                     + CLIENTE_APELLIDO + " text not null, "
-                    + CLIENTE_CELULAR + " text not null)";
+                    + CLIENTE_CELULAR + " text not null, "
+                    + CLIENTE_UBICACION + " text not null)";
 
 
     //TABLA REPARTIDOR
@@ -51,6 +53,7 @@ public class DBmigrations {
     public static final String PRODUCTO_NOMBRE = "nombre";
     public static final String PRODUCTO_DESCRIPCION = "descripcion";
     public static final String PRODUCTO_PRECIO = "precio";
+    public static final String PRODUCTO_FOTO = "foto";
     public static final String PRODUCTO_CATEGORIAID= "categoria_id";
 
 
@@ -61,6 +64,7 @@ public class DBmigrations {
                     + PRODUCTO_NOMBRE + " text not null, "
                     + PRODUCTO_DESCRIPCION + " text not null, "
                     + PRODUCTO_PRECIO + " integer not null, "
+                    + PRODUCTO_FOTO + " text not null, "
                     + PRODUCTO_CATEGORIAID + " integer not null, "
                     +"foreign key ("+PRODUCTO_CATEGORIAID+") references "+TABLA_CATEGORIA+"(id) )";
 
@@ -88,7 +92,7 @@ public class DBmigrations {
                     +"foreign key ("+PEDIDO_CLIENTE_ID+") references "+TABLA_CLIENTE+"(id), "
                     +"foreign key ("+PEDIDO_REPARTIDOR_ID+") references "+TABLA_REPARTIDOR+"(id) )";
 
-    //TABLA PEDIDO
+    //TABLA DETALLE_PEDIDO
     public static final String TABLA_DETALLE_PEDIDO = "detalle_pedidos";
     public static final String DETALLE_PEDIDO_ID = "id";
     public static final String DETALLE_PEDIDO_PEDIDO_ID = "pedido_id";

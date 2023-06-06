@@ -13,20 +13,24 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.common.api.Api;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import arquitectura.trescapas.primerparcial.DB.DBmigrations;
 import arquitectura.trescapas.primerparcial.Negocio.Ncliente;
+import arquitectura.trescapas.primerparcial.Negocio.Ncliente1;
 import arquitectura.trescapas.primerparcial.R;
+import arquitectura.trescapas.primerparcial.clases.Cliente;
 
 public class Pcliente extends AppCompatActivity {
-    EditText etNombre, etCelular, etApellido;
+    EditText etNombre, etCelular, etApellido,etLink;
     RecyclerView rv1;
     AdaptadorCliente aC;
-    Ncliente cliente;
-    List<Map<String,Object>> list;
+    Ncliente1 cliente;
+    List<Cliente> list;
 
     int pos;
     @Override
@@ -35,11 +39,12 @@ public class Pcliente extends AppCompatActivity {
         setContentView(R.layout.activity_pcliente);
         //getSupportActionBar().setTitle("Clientes");
 
-        cliente = new Ncliente(this);
+        cliente = new Ncliente1(this);
         list = cliente.getDatos();
         etNombre = findViewById(R.id.editNombre);
         etCelular = findViewById(R.id.editCelular);
         etApellido = findViewById(R.id.editApellido);
+        etLink = findViewById(R.id.editLink);
         rv1 = findViewById(R.id.rv1);
 
         LinearLayoutManager l=new LinearLayoutManager(this);
@@ -53,29 +58,18 @@ public class Pcliente extends AppCompatActivity {
         String nombre= etNombre.getText().toString();
         String apellido=  etApellido.getText().toString();
         String celular= etCelular.getText().toString();
+        String ubicacion= etLink.getText().toString();
 
-        Map<String, Object> data = new HashMap<>();
-
-        data.put(DBmigrations.CLIENTE_NOMBRE,nombre);
-        data.put(DBmigrations.CLIENTE_APELLIDO,apellido);
-        data.put(DBmigrations.CLIENTE_CELULAR,celular);
-        //Ncliente cliente = new Ncliente(this);
-
-            if (cliente.saveDatos(data)){
-                listar();
-                rv1.scrollToPosition(list.size()-1);
-                Toast.makeText(this, "cliente creado", Toast.LENGTH_SHORT).show();
-
-            }else {
-                Toast.makeText(this, "cliente ya existente", Toast.LENGTH_SHORT).show();
-            }
-
+        Cliente cl = Cliente.crear("",nombre,apellido,celular,ubicacion);
+        cliente.saveDatos(cl);
+        listar();
+        rv1.scrollToPosition(list.size()-1);
     }
 
     public void mostrar(int position) {
-        etNombre.setText(list.get(position).get(DBmigrations.CLIENTE_NOMBRE).toString());
-        etApellido.setText(list.get(position).get(DBmigrations.CLIENTE_APELLIDO).toString());
-        etCelular.setText(list.get(position).get(DBmigrations.CLIENTE_CELULAR).toString());
+        etNombre.setText(list.get(position).getNombre());
+        etApellido.setText(list.get(position).getApellido());
+        etCelular.setText(list.get(position).getCelular());
         this.pos = position;
     }
     public void actualizar(View v) {
@@ -83,15 +77,12 @@ public class Pcliente extends AppCompatActivity {
         String apellido=  etApellido.getText().toString();
         String celular= etCelular.getText().toString();
 
-        String id = list.get(this.pos).get("id").toString();
+        String id = list.get(this.pos).getId();
         //Toast.makeText(Pcliente.this, id, Toast.LENGTH_SHORT).show();
 
-        Map<String, Object> data = new HashMap<>();
-        data.put(DBmigrations.CLIENTE_ID,id);
-        data.put(DBmigrations.CLIENTE_NOMBRE,nombre);
-        data.put(DBmigrations.CLIENTE_APELLIDO,apellido);
-        data.put(DBmigrations.CLIENTE_CELULAR,celular);
-        cliente.updateDatos(data);
+        Cliente cl = new Cliente();
+        cl.crear(id,nombre,apellido,celular,"");
+        cliente.updateDatos(cl);
         listar();
 
     }
@@ -145,9 +136,9 @@ public class Pcliente extends AppCompatActivity {
 
             public void imprimir(int position) {
                 list = cliente.getDatos();
-                tv1.setText(list.get(position).get("nombre").toString());
-                tv2.setText(list.get(position).get("apellido").toString());
-                tv3.setText(list.get(position).get("celular").toString());
+                tv1.setText(list.get(position).getNombre());
+                tv2.setText(list.get(position).getApellido());
+                tv3.setText(list.get(position).getCelular());
 
             }
 
@@ -168,7 +159,7 @@ public class Pcliente extends AppCompatActivity {
             private void onClickEliminar() {
                 int position = getLayoutPosition();
                 if (position != RecyclerView.NO_POSITION) {
-                    String id = list.get(getLayoutPosition()).get("id").toString();
+                    String id = list.get(getLayoutPosition()).getId();
                     cliente.delete(id);
                     listar();
                     Toast.makeText(Pcliente.this, "eliminado", Toast.LENGTH_SHORT).show();

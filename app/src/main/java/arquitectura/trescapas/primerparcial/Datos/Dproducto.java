@@ -6,22 +6,24 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import arquitectura.trescapas.primerparcial.DB.DBmanager;
+import arquitectura.trescapas.primerparcial.DB.DBmanager1;
 import arquitectura.trescapas.primerparcial.DB.DBmigrations;
-import arquitectura.trescapas.primerparcial.Utils.IDatos;
+import arquitectura.trescapas.primerparcial.Utils.IDatos1;
 
-public class Dproducto implements IDatos {
-    private DBmanager db;
+public class Dproducto implements IDatos1 {
+    private DBmanager1 db;
 
 //    private String id;
 //    private String nombre;
 //    private String descripcion;
 //    private String precio;
 //    private String categoriaId;
+//    private String foto;
+
     private Map<String,Object> row;
 
     public Dproducto(Context context) {
-        this.db = new DBmanager(context);
+        this.db = new DBmanager1(context);
         this.row = new HashMap<>();
 
         row.put(DBmigrations.PRODUCTO_ID,"");
@@ -29,6 +31,7 @@ public class Dproducto implements IDatos {
         row.put(DBmigrations.PRODUCTO_DESCRIPCION,"");
         row.put(DBmigrations.PRODUCTO_PRECIO,"");
         row.put(DBmigrations.PRODUCTO_CATEGORIAID,"");
+        row.put(DBmigrations.PRODUCTO_FOTO,"");
     }
 
 

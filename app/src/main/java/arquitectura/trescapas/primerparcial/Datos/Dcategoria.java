@@ -6,19 +6,19 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import arquitectura.trescapas.primerparcial.DB.DBmanager;
+import arquitectura.trescapas.primerparcial.DB.DBmanager1;
 import arquitectura.trescapas.primerparcial.DB.DBmigrations;
-import arquitectura.trescapas.primerparcial.Utils.IDatos;
+import arquitectura.trescapas.primerparcial.Utils.IDatos1;
 
-public class Dcategoria implements IDatos {
-    private DBmanager db;
+public class Dcategoria implements IDatos1 {
+    private DBmanager1 db;
 
     private String id;
     private String nombre;
     private Map<String,Object> row;
 
     public Dcategoria(Context context) {
-        this.db = new DBmanager(context);
+        this.db = new DBmanager1(context);
         this.row = new HashMap<>();
 
         row.put(DBmigrations.CATEGORIA_ID,"");

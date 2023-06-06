@@ -9,7 +9,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.PrimerParcial">
-        <activity android:name=".PdetallePedido"></activity>
+        <activity android:name=".EditarProducto"></activity>
+        <activity android:name=".PdetallePedido" />
         <activity android:name=".Presentacion.Ppedido" />
         <activity android:name=".Pcotizacion" />
         <activity android:name=".Presentacion.Pproduto" />

@@ -13,12 +13,12 @@ import java.util.List;
 import java.util.Map;
 
 
-public class DBmanager {
+public class DBmanager1 {
 
     private DBconexion conexion;
     private SQLiteDatabase basededatos;
 
-    public DBmanager(Context constext) {
+    public DBmanager1(Context constext) {
 
         this.conexion = new DBconexion(constext);
         this.open();
@@ -34,7 +34,7 @@ public class DBmanager {
         this.close();
     }
 
-    public DBmanager open() throws SQLException {
+    public DBmanager1 open() throws SQLException {
         basededatos = conexion.getWritableDatabase();
 
         return this;
@@ -130,7 +130,7 @@ public class DBmanager {
         return datos;
     }
 
-    public  Map<String,Object> getById(String tabla,Map<String,Object> data, String id) {
+      public  Map<String,Object> getById(String tabla,Map<String,Object> data, String id) {
         String [] SelectionArgs = {id};
         this.open();
         Cursor cursor = basededatos.query(tabla, null ,"id = ?",SelectionArgs,null,null,null);

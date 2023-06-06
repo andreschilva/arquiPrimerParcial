@@ -1,14 +1,13 @@
 package arquitectura.trescapas.primerparcial.Presentacion;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.app.DatePickerDialog;
 import android.app.Dialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -16,19 +15,17 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.CheckBox;
-import android.widget.CompoundButton;
-import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.FileOutputStream;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,22 +33,26 @@ import java.util.Map;
 import arquitectura.trescapas.primerparcial.DB.DBmigrations;
 import arquitectura.trescapas.primerparcial.Negocio.Ncategoria;
 import arquitectura.trescapas.primerparcial.Negocio.Nproducto;
+import arquitectura.trescapas.primerparcial.Presentacion.adaptadores.AdaptadorProducto;
 import arquitectura.trescapas.primerparcial.R;
 
-public class Pproduto extends AppCompatActivity {
+public class Pproduto extends AppCompatActivity{
     final int CAPTURA_IMAGEN = 1;
     RecyclerView rv1;
+    TextView  tvNumero;
+    ImageButton btnFoto;
     AdaptadorProducto aP;
+
     Nproducto producto;
     Ncategoria categoria;
     List<Map<String,Object>> listProductos;
     List<Map<String,Object>> lisCategorias;
+    List<Map<String,Object>> lisProductoCategoria;
+    List<Map<String,Object>> listProductosSeleccionados;
 
-    ImageButton btnFoto;
+    //int pos;
 
-    List<Map<String,Object>> listCotizacion;
-    TextView  tvNumero;
-    int pos;
+    String nombreFoto;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -62,16 +63,94 @@ public class Pproduto extends AppCompatActivity {
         producto = new Nproducto(this);
         categoria = new Ncategoria(this);
         listProductos = producto.getDatos();
-        lisCategorias= categoria.getDatos();
-        listCotizacion = new ArrayList<>();
+        lisCategorias = categoria.getDatos();
+        unirtListaProductoCategoria();
+        listProductosSeleccionados = new ArrayList<>();
 
         rv1 = findViewById(R.id.rv1);
 
-        LinearLayoutManager l=new LinearLayoutManager(this);
+        LinearLayoutManager l = new LinearLayoutManager(this);
         rv1.setLayoutManager(l);
-        aP= new AdaptadorProducto();
+        aP = new AdaptadorProducto(this,listProductosSeleccionados, lisProductoCategoria);
+        eliminarProducto();
+        editarProducto();
         rv1.setAdapter(aP);
 
+    }
+
+    private void eliminarProducto() {
+        aP.setOnClickListenerBtnEliminar(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(Pproduto.this);
+                builder.setMessage("Esta seguro que desea Eliminar este producto?");
+
+                builder.setPositiveButton("Confirmar", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        int position = aP.getPosition();
+                        if (position != RecyclerView.NO_POSITION) {
+                            String id = listProductos.get(position).get("id").toString();
+                            producto.delete(id);
+                            listar();
+                            Toast.makeText(Pproduto.this, "eliminado", Toast.LENGTH_SHORT).show();
+                        }
+
+                    }
+                });
+
+                builder.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                    }
+                });
+
+                builder.create().show();
+            }
+        });
+    }
+    private void editarProducto() {
+        aP.setOnClickListenerBtnEdit(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(Pproduto.this);
+                builder.setMessage("Desea Guardar Los Cambios?");
+
+                builder.setPositiveButton("Confirmar", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        Map<String, Object> data = aP.getProductoSeleccionado();
+                        producto.updateDatos(data);
+                        listar();
+                    }
+                });
+
+                builder.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                    }
+                });
+
+                builder.create().show();
+            }
+        });
+    }
+
+
+    private void unirtListaProductoCategoria() {
+        lisProductoCategoria = new ArrayList<>() ;
+        for (Map<String,Object> productoActual: listProductos ) {
+            String categoriaId = productoActual.get(DBmigrations.PRODUCTO_CATEGORIAID).toString();
+            for (Map<String,Object> categoriaActual: lisCategorias ) {
+                if (categoriaId.compareTo(categoriaActual.get(DBmigrations.CATEGORIA_ID).toString()) == 0) {
+                    productoActual.put("nombreCategoria",categoriaActual.get(DBmigrations.CATEGORIA_NOMBRE));
+                    break;
+                }
+            }
+            lisProductoCategoria.add(productoActual);
+        }
     }
 
     public void agregarProducto(View v) {
@@ -129,6 +208,7 @@ public class Pproduto extends AppCompatActivity {
                 data.put(DBmigrations.PRODUCTO_DESCRIPCION,descripcion);
                 data.put(DBmigrations.PRODUCTO_PRECIO,precio);
                 data.put(DBmigrations.PRODUCTO_CATEGORIAID,categoriaSeleccionada.get("id"));
+                data.put(DBmigrations.PRODUCTO_FOTO,nombreFoto);
 
 
                 if (producto.saveDatos(data)){
@@ -163,7 +243,21 @@ public class Pproduto extends AppCompatActivity {
             Bundle extras = data.getExtras();
             Bitmap bitmap1 = (Bitmap)extras.get("data");
             btnFoto.setImageBitmap(bitmap1);
+
+            try {
+                nombreFoto = crearNombreArchivoJPG();
+                FileOutputStream fos = openFileOutput(nombreFoto, Context.MODE_PRIVATE);
+                bitmap1.compress(Bitmap.CompressFormat.JPEG,100,fos);
+                fos.close();
+            }catch (Exception e) {
+
+            }
         }
+    }
+
+    private String crearNombreArchivoJPG() {
+        String fecha = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        return fecha+".jpg";
     }
 
     //    public void agregar(View v) {
@@ -223,6 +317,8 @@ public class Pproduto extends AppCompatActivity {
 //    }
     public void listar() {
         this.listProductos = producto.getDatos();
+        unirtListaProductoCategoria();
+        aP.setListProductos(this.lisProductoCategoria);
         aP.notifyDataSetChanged();
     }
 
@@ -233,15 +329,17 @@ public class Pproduto extends AppCompatActivity {
         mensaje.append("Lista de productos:\n");
 
         double total = 0.0;
-        for (Map<String, Object> producto : this.listCotizacion) {
+        for (Map<String, Object> producto : this.listProductosSeleccionados) {
             String nombre =  producto.get("nombre").toString();
             double precio =Double.parseDouble( producto.get("precio").toString());
+            int cantidad = Integer.parseInt(producto.get("cantidad").toString());
 
             mensaje.append("Nombre: ").append(nombre).append("\n");
             mensaje.append("Precio: ").append(precio).append("\n");
+            mensaje.append("Cantidad: ").append(cantidad).append("\n");
             mensaje.append("-----------------\n");
 
-            total += precio;
+            total += precio*cantidad;
         }
         mensaje.append("Total: ").append(total).append("\n");
 
@@ -257,93 +355,4 @@ public class Pproduto extends AppCompatActivity {
 //        }
     }
 
-    private class AdaptadorProducto extends RecyclerView.Adapter<AdaptadorProducto.AdaptadorProductoHolder> {
-
-        @NonNull
-        @Override
-        public AdaptadorProducto.AdaptadorProductoHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-            return new AdaptadorProducto.AdaptadorProductoHolder(getLayoutInflater().inflate(R.layout.item_producto,parent,false));
-        }
-
-        @Override
-        public void onBindViewHolder(@NonNull AdaptadorProducto.AdaptadorProductoHolder holder, int position) {
-
-            holder.imprimir(position);
-
-
-        }
-
-        @Override
-        public int getItemCount() {
-            return listProductos.size();
-        }
-
-        public class AdaptadorProductoHolder extends RecyclerView.ViewHolder  implements View.OnClickListener {
-
-            TextView tv1, tv2, tv3,tv4;
-            CheckBox chCotizacion;
-            Button btnEliminar;
-
-            public AdaptadorProductoHolder(@NonNull View itemView) {
-                super(itemView);
-                tv1 = itemView.findViewById(R.id.tvNombre);
-                tv2 = itemView.findViewById(R.id.tvDescripcion);
-                tv3 = itemView.findViewById(R.id.tvPrecio);
-                tv4 = itemView.findViewById(R.id.tvCategoria);
-                chCotizacion = itemView.findViewById(R.id.cBCotizacion);
-                btnEliminar =  itemView.findViewById(R.id.btnEliminar);
-                itemView.setOnClickListener(this);
-
-                btnEliminar.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        onClickEliminar();
-                    }
-                });
-
-                chCotizacion.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-                    @Override
-                    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                        onCheckedCotizacion();
-                    }
-                });
-
-            }
-
-            private void onCheckedCotizacion() {
-                if (chCotizacion.isChecked())
-                    listCotizacion.add(listProductos.get(getLayoutPosition()));
-                else {
-                    listCotizacion.remove(listProductos.get(getLayoutPosition()));
-                }
-            }
-
-            public void imprimir(int position) {
-                listProductos = producto.getDatos();
-                tv1.setText(listProductos.get(position).get("nombre").toString());
-                tv2.setText(listProductos.get(position).get("descripcion").toString());
-                tv3.setText(listProductos.get(position).get("precio").toString());
-                String idcategoria =listProductos.get(position).get("categoria_id").toString();
-                String nombreCategoria= categoria.getDcategoriaById(idcategoria).row().get("nombre").toString();
-                tv4.setText(nombreCategoria);
-            }
-
-
-            @Override
-            public void onClick(View v) {
-                int position = getLayoutPosition();
-                mostrar(position);
-            }
-
-            private void onClickEliminar() {
-                int position = getLayoutPosition();
-                if (position != RecyclerView.NO_POSITION) {
-                    String id = listProductos.get(getLayoutPosition()).get("id").toString();
-                    producto.delete(id);
-                    listar();
-                    Toast.makeText(Pproduto.this, "eliminado", Toast.LENGTH_SHORT).show();
-                }
-            }
-        }
-    }
 }

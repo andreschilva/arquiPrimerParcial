@@ -6,12 +6,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import arquitectura.trescapas.primerparcial.DB.DBmanager;
+import arquitectura.trescapas.primerparcial.DB.DBmanager1;
 import arquitectura.trescapas.primerparcial.DB.DBmigrations;
-import arquitectura.trescapas.primerparcial.Utils.IDatos;
+import arquitectura.trescapas.primerparcial.Utils.IDatos1;
 
-public class DdetallePedido implements IDatos {
-    private DBmanager db;
+public class DdetallePedido implements IDatos1 {
+    private DBmanager1 db;
 
     private String pedido_id;
     private String producto_id;
@@ -19,7 +19,7 @@ public class DdetallePedido implements IDatos {
     private Map<String,Object> row;
 
     public DdetallePedido(Context context) {
-        this.db = new DBmanager(context);
+        this.db = new DBmanager1(context);
         this.row = new HashMap<>();
 
         row.put(DBmigrations.DETALLE_PEDIDO_ID,"");
@@ -68,6 +68,10 @@ public class DdetallePedido implements IDatos {
 
     @Override
     public List<Map<String,Object>> getAll() {
+        return db.selectAll(DBmigrations.TABLA_DETALLE_PEDIDO,this.row);
+    }
+
+    public List<Map<String,Object>> query() {
         return db.selectAll(DBmigrations.TABLA_DETALLE_PEDIDO,this.row);
     }
 

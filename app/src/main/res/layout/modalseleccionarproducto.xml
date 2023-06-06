@@ -7,7 +7,7 @@
     android:layout_height="match_parent">
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rv"
+        android:id="@+id/rv2"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_above="@+id/buttonsLayout" />
@@ -21,21 +21,20 @@
         android:padding="8dp">
 
         <Button
+            android:id="@+id/btncancelar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_weight="1"
+            android:text="cancelar" />
+
+        <Button
             android:id="@+id/btnAgregar"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="agregar"
             android:layout_weight="1"
-            />
-
-        <Button
-            android:id="@+id/btncancelar"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="cancelar"
-            android:layout_weight="1"
-            android:layout_marginStart="8dp"
-            android:layout_marginLeft="8dp"
             />
 
     </LinearLayout>

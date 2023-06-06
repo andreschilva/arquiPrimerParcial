@@ -6,12 +6,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import arquitectura.trescapas.primerparcial.DB.DBmanager;
+import arquitectura.trescapas.primerparcial.DB.DBmanager1;
 import arquitectura.trescapas.primerparcial.DB.DBmigrations;
-import arquitectura.trescapas.primerparcial.Utils.IDatos;
+import arquitectura.trescapas.primerparcial.Utils.IDatos1;
 
-public class Dpedido implements IDatos {
-    private DBmanager db;
+public class Dpedido implements IDatos1 {
+    private DBmanager1 db;
 
     private String id;
     private String estado;
@@ -20,7 +20,7 @@ public class Dpedido implements IDatos {
     private Map<String,Object> row;
 
     public Dpedido(Context context) {
-        this.db = new DBmanager(context);
+        this.db = new DBmanager1(context);
         this.row = new HashMap<>();
 
         row.put(DBmigrations.PEDIDO_ID,"");

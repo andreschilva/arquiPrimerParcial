@@ -36,4 +36,5 @@ public class Nproducto {
     public Dproducto getDcategoriaById(String id) {
         return dproducto.getById(id);
     }
+
 }
