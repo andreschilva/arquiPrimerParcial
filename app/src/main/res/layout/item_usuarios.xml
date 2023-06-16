@@ -1,87 +1,159 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="8dp"
-    android:background="#F0F8FF"
-    android:orientation="horizontal">
+    android:layout_margin="15dp"
+    android:layout_weight="1"
+    android:foreground="?selectableItemBackground"
+    app:cardCornerRadius="10dp"
+    app:cardElevation="6dp"
+    app:layout_rowWeight="1">
 
-    <LinearLayout
-        android:layout_width="wrap_content"
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="6dp"
-        android:layout_marginRight="6dp"
-        android:layout_weight="1"
-        android:orientation="vertical">
+        android:padding="4dp">
+
+
+        <EditText
+            android:id="@+id/edCelularU"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="53dp"
+            android:layout_marginLeft="53dp"
+            android:layout_marginTop="4dp"
+            android:textSize="18sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.33"
+            app:layout_constraintStart_toEndOf="@+id/tvCelularU"
+            app:layout_constraintTop_toBottomOf="@+id/edApellidoU" />
+
+        <EditText
+            android:id="@+id/edApellidoU"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="43dp"
+            android:layout_marginLeft="43dp"
+            android:layout_marginTop="4dp"
+            android:textSize="18sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.31"
+            app:layout_constraintStart_toEndOf="@+id/tvApellidoU"
+            app:layout_constraintTop_toBottomOf="@+id/edNombreU" />
+
+        <EditText
+            android:id="@+id/edLinkU"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="27dp"
+            android:layout_marginLeft="27dp"
+            android:layout_marginTop="4dp"
+            android:textSize="18sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.15"
+            app:layout_constraintStart_toEndOf="@+id/tvGenerico1U"
+            app:layout_constraintTop_toBottomOf="@+id/edCelularU" />
+
+        <EditText
+            android:id="@+id/edNombreU"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="45dp"
+            android:layout_marginLeft="45dp"
+            android:layout_marginTop="8dp"
+            android:textSize="18sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.31"
+            app:layout_constraintStart_toEndOf="@+id/tvNombreU"
+            app:layout_constraintTop_toBottomOf="@+id/iv1" />
+
+        <ImageView
+            android:id="@+id/iv1"
+            android:layout_width="131dp"
+            android:layout_height="122dp"
+            android:layout_marginTop="4dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.501"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:srcCompat="@drawable/imagen" />
 
         <TextView
-            android:id="@+id/tvestado2"
+            android:id="@+id/tvNombreU"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="nombre:"
-            android:textColor="#3949AB"
-            android:textSize="24sp" />
+            android:layout_marginTop="16dp"
+            android:text="Nombre:"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/iv1" />
 
         <TextView
-            android:id="@+id/tvCliente2"
+            android:id="@+id/tvApellidoU"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="apellido:"
-            android:textColor="#3949AB"
-            android:textSize="24sp" />
+            android:layout_marginTop="16dp"
+            android:text="Apellido:"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/edNombreU" />
 
         <TextView
-            android:id="@+id/tvRepartidor2"
+            android:id="@+id/tvCelularU"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="celular:"
-            android:textColor="#3949AB"
-            android:textSize="24sp" />
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="167dp"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:orientation="vertical"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+            android:layout_marginTop="16dp"
+            android:text="Celular:"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/edApellidoU" />
 
         <TextView
-            android:id="@+id/tvEstado"
-            android:layout_width="wrap_content"
+            android:id="@+id/tvGenerico1U"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:textSize="24sp" />
 
-        <TextView
-            android:id="@+id/tvCliente"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="24sp" />
+            android:layout_marginTop="4dp"
+            android:text="Link\nUbicación:"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/edCelularU" />
 
-        <TextView
-            android:id="@+id/tvRepartidor"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="24sp" />
-
-    </LinearLayout>
-
-    <FrameLayout
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:layout_weight="1">
-
-        <Button
+        <ImageButton
             android:id="@+id/btnEliminar"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:text="Eliminar"
-            android:textSize="10sp" />
-    </FrameLayout>
+            android:layout_marginTop="12dp"
+            android:layout_marginBottom="4dp"
+            android:background="@android:color/transparent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/edLinkU"
+            app:srcCompat="@drawable/eliminar2" />
 
-</LinearLayout>
+        <ImageButton
+            android:id="@+id/btnEdit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginRight="16dp"
+            android:layout_marginBottom="4dp"
+            android:background="@android:color/transparent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/btnEliminar"
+            app:layout_constraintHorizontal_bias="1.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/edLinkU"
+            app:layout_constraintVertical_bias="0.2"
+            app:srcCompat="@drawable/guardar" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.cardview.widget.CardView>

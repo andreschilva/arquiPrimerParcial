@@ -1,10 +1,12 @@
 package arquitectura.trescapas.primerparcial.fragments;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
 
@@ -18,6 +20,7 @@ import arquitectura.trescapas.primerparcial.Presentacion.Ppedido;
 import arquitectura.trescapas.primerparcial.Presentacion.Pproduto;
 import arquitectura.trescapas.primerparcial.Presentacion.Prepartidor;
 import arquitectura.trescapas.primerparcial.R;
+import arquitectura.trescapas.primerparcial.clases.Repartidor;
 
 
 public class MenuFragment extends Fragment {
@@ -84,9 +87,25 @@ public class MenuFragment extends Fragment {
         cardSalir.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (getActivity() != null) {
-                    getActivity().finishAffinity();
-                }
+                AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                builder.setMessage("Desea salir de la aplicacion?");
+
+                builder.setPositiveButton("Salir", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        if (getActivity() != null) {
+                            getActivity().finishAffinity();
+                        }
+                    }
+                });
+
+                builder.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                    }
+                });
+                builder.create().show();
             }
         });
     }

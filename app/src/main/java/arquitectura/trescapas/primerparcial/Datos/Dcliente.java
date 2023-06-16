@@ -1,78 +1,50 @@
 package arquitectura.trescapas.primerparcial.Datos;
 
+import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
-import arquitectura.trescapas.primerparcial.DB.DBmanager1;
+import arquitectura.trescapas.primerparcial.DB.Dato;
 import arquitectura.trescapas.primerparcial.DB.DBmigrations;
-import arquitectura.trescapas.primerparcial.Utils.IDatos1;
+import arquitectura.trescapas.primerparcial.clases.Cliente;
 
-public class Dcliente implements IDatos1 {
-    private DBmanager1 db;
-
-    private String id;
-    private String nombre;
-    private String apellido;
-    private String celular;
-    private Map<String,Object> row;
+public class Dcliente extends Dato<Cliente> {
 
     public Dcliente(Context context) {
-        this.db = new DBmanager1(context);
-        this.row = new HashMap<>();
-
-        row.put(DBmigrations.CLIENTE_ID,"");
-        row.put(DBmigrations.CLIENTE_NOMBRE,"");
-        row.put(DBmigrations.CLIENTE_APELLIDO,"");
-        row.put(DBmigrations.CLIENTE_CELULAR,"");
-        row.put(DBmigrations.CLIENTE_UBICACION,"");
-    }
-
-
-    public void setData(Map<String, Object> data) {
-        this.row.putAll(data);
-
-    }
-
-
-    public void setData(String nombre,String apellido, String celular) {
-        this.nombre = nombre;
-        this.apellido  = apellido;
-        this.celular = celular;
+        super(context);
+        super.tabla = DBmigrations.TABLA_CLIENTE;
     }
 
     @Override
-    public boolean save( ) {
-        return db.insert(DBmigrations.TABLA_CLIENTE,this.row);
+    protected ContentValues getContentValues(Cliente data) {
+        ContentValues values = new ContentValues();
+
+        if (data.getId() != "") {
+            values.put(DBmigrations.CLIENTE_ID, data.getId());
+        }
+        values.put(DBmigrations.CLIENTE_NOMBRE, data.getNombre());
+        values.put(DBmigrations.CLIENTE_APELLIDO, data.getApellido());
+        values.put(DBmigrations.CLIENTE_CELULAR, data.getCelular());
+        values.put(DBmigrations.CLIENTE_UBICACION, data.getUbicacion());
+        return values;
     }
 
     @Override
-    public void update(Map<String, Object> data) {
+    protected Cliente getdata(Cursor cursor) {
 
-        db.updateData(DBmigrations.TABLA_CLIENTE,  data);
-    }
+        Cliente cliente = new Cliente();
 
-    @Override
-    public void delete(String id) {
-        this.row.put("id",id);
-        db.deleteData(DBmigrations.TABLA_CLIENTE, this.row.get("id").toString());
-    }
+        cliente.setId(cursor.getString(cursor.getColumnIndexOrThrow(DBmigrations.CLIENTE_ID)));
+        cliente.setNombre(cursor.getString(cursor.getColumnIndexOrThrow(DBmigrations.CLIENTE_NOMBRE)));
+        cliente.setApellido(cursor.getString(cursor.getColumnIndexOrThrow(DBmigrations.CLIENTE_APELLIDO)));
+        cliente.setCelular(cursor.getString(cursor.getColumnIndexOrThrow(DBmigrations.CLIENTE_CELULAR)));
+        cliente.setUbicacion(cursor.getString(cursor.getColumnIndexOrThrow(DBmigrations.CLIENTE_UBICACION)));
 
-    @Override
-    public Dcliente getById(String id) {
-        Map<String,Object> cliente =db.getById(DBmigrations.TABLA_CLIENTE,this.row,id);
-        this.row.putAll(cliente);
-        return this;
-    }
-
-    @Override
-    public List<Map<String,Object>> getAll() {
-        return db.selectAll(DBmigrations.TABLA_CLIENTE,this.row);
-    }
-
-    public  Map<String,Object> row() {
-        return this.row;
+        return cliente;
     }
 }
+
+

@@ -14,137 +14,109 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="match_parent"
+        android:layout_margin="4dp">
 
         <TextView
             android:id="@+id/tvestado2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginLeft="16dp"
             android:layout_marginTop="16dp"
             android:text="Estado:"
-            android:textColor="#3949AB"
             android:textSize="24sp"
+            android:textStyle="bold"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <TextView
-            android:id="@+id/tvEstado"
+        <Spinner
+            android:id="@+id/spEstadoPedido"
+            style="@android:style/Widget.Material.Light.Spinner.Underlined"
             android:layout_width="0dp"
-            android:layout_height="29dp"
+            android:layout_height="wrap_content"
             android:layout_marginStart="55dp"
             android:layout_marginLeft="55dp"
-            android:layout_marginTop="16dp"
-            android:textSize="24sp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginRight="8dp"
+            android:theme="?attr/ratingBarStyle"
+            app:layout_constraintEnd_toStartOf="@+id/btnCambiarEstado"
             app:layout_constraintStart_toEndOf="@+id/tvestado2"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            tools:targetApi="lollipop" />
 
         <TextView
             android:id="@+id/tvCliente2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginLeft="16dp"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="16dp"
             android:text="Cliente"
-            android:textColor="#3949AB"
             android:textSize="24sp"
+            android:textStyle="bold"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/tvEstado" />
+            app:layout_constraintTop_toBottomOf="@+id/spEstadoPedido" />
 
-        <TextView
-            android:id="@+id/tvCliente"
+        <Spinner
+            android:id="@+id/spClientePedido"
+            style="@android:style/Widget.Material.Light.Spinner.Underlined"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="61dp"
             android:layout_marginLeft="61dp"
-            android:layout_marginTop="8dp"
-            android:textSize="24sp"
+            android:layout_marginTop="1dp"
+            android:theme="?attr/ratingBarStyle"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.027"
             app:layout_constraintStart_toEndOf="@+id/tvCliente2"
-            app:layout_constraintTop_toBottomOf="@+id/tvEstado" />
+            app:layout_constraintTop_toBottomOf="@+id/spEstadoPedido"
+            tools:targetApi="lollipop" />
 
         <TextView
             android:id="@+id/tvRepartidor2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginLeft="16dp"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="16dp"
             android:text="Repartidor:"
-            android:textColor="#3949AB"
             android:textSize="24sp"
+            android:textStyle="bold"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/tvCliente" />
+            app:layout_constraintTop_toBottomOf="@+id/spClientePedido" />
 
-        <TextView
-            android:id="@+id/tvRepartidor"
+        <Spinner
+            android:id="@+id/spRepartidorPedido"
+            style="@android:style/Widget.Material.Light.Spinner.Underlined"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="19dp"
-            android:layout_marginLeft="19dp"
-            android:layout_marginTop="8dp"
-            android:textSize="24sp"
+            android:layout_marginStart="16dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginTop="1dp"
+            android:theme="?attr/ratingBarStyle"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.009"
             app:layout_constraintStart_toEndOf="@+id/tvRepartidor2"
-            app:layout_constraintTop_toBottomOf="@+id/tvCliente" />
+            app:layout_constraintTop_toBottomOf="@+id/spClientePedido"
+            tools:targetApi="lollipop" />
 
         <TextView
             android:id="@+id/tvFecha2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginLeft="16dp"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="16dp"
             android:text="Fecha:"
-            android:textColor="#3949AB"
             android:textSize="24sp"
+            android:textStyle="bold"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/tvRepartidor" />
-
-        <TextView
-            android:id="@+id/tvFecha"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="65dp"
-            android:layout_marginLeft="65dp"
-            android:layout_marginTop="8dp"
-            android:textSize="24sp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.044"
-            app:layout_constraintStart_toEndOf="@+id/tvFecha2"
-            app:layout_constraintTop_toBottomOf="@+id/tvRepartidor" />
+            app:layout_constraintTop_toBottomOf="@+id/spRepartidorPedido" />
 
         <TextView
             android:id="@+id/tvTotal2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginLeft="16dp"
-            android:layout_marginTop="12dp"
+            android:layout_marginTop="16dp"
             android:text="Total:"
-            android:textColor="#3949AB"
             android:textSize="24sp"
+            android:textStyle="bold"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/tvFecha" />
-
-        <TextView
-            android:id="@+id/tvTotal"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="75dp"
-            android:layout_marginLeft="75dp"
-            android:layout_marginTop="12dp"
-            android:textSize="24sp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.18"
-            app:layout_constraintStart_toEndOf="@+id/tvTotal2"
-            app:layout_constraintTop_toBottomOf="@+id/tvFecha" />
+            app:layout_constraintTop_toBottomOf="@+id/edFechaPedido" />
 
         <Button
             android:id="@+id/btnDetalles"
@@ -153,36 +125,97 @@
             android:layout_gravity="center_horizontal"
             android:layout_marginStart="10dp"
             android:layout_marginLeft="10dp"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="4dp"
             android:layout_marginEnd="10dp"
             android:layout_marginRight="10dp"
             android:text="Detalles"
             android:textSize="12sp"
             app:backgroundTint="@color/amarillo_700"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintHorizontal_bias="1.0"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/tvTotal" />
+            app:layout_constraintTop_toBottomOf="@+id/btnSave" />
 
-        <Button
+        <ImageButton
             android:id="@+id/btnEliminar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginTop="4dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginRight="8dp"
+            android:background="@drawable/eliminar2"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.987"
+            app:layout_constraintStart_toEndOf="@+id/btnSave"
+            app:layout_constraintTop_toBottomOf="@+id/edTotalPedido" />
+
+        <ImageButton
+            android:id="@+id/btnSave"
+            android:layout_width="47dp"
+            android:layout_height="47dp"
+            android:layout_marginTop="4dp"
+            android:background="@android:color/transparent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.792"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/edTotalPedido"
+            app:srcCompat="@drawable/guardar" />
+
+        <ImageButton
+            android:id="@+id/btnFecha"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginRight="8dp"
+            android:background="@android:color/transparent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.996"
+            app:layout_constraintStart_toEndOf="@+id/tvFecha2"
+            app:layout_constraintTop_toBottomOf="@+id/spRepartidorPedido"
+            app:srcCompat="@drawable/ic_baseline_calendar_month_24" />
+
+        <EditText
+            android:id="@+id/edFechaPedido"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginStart="10dp"
-            android:layout_marginLeft="10dp"
-            android:layout_marginEnd="10dp"
-            android:layout_marginRight="10dp"
-            android:layout_marginBottom="10dp"
-            android:text="Eliminar"
-            android:textSize="12sp"
-            app:backgroundTint="@color/amarillo_700"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginStart="65dp"
+            android:layout_marginLeft="65dp"
+            android:layout_marginTop="4dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginRight="8dp"
+            android:ems="10"
+            android:inputType="date"
+            app:layout_constraintEnd_toStartOf="@+id/btnFecha"
             app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/btnDetalles"
-            app:layout_constraintVertical_bias="0.0" />
+            app:layout_constraintStart_toEndOf="@+id/tvFecha2"
+            app:layout_constraintTop_toBottomOf="@+id/spRepartidorPedido" />
+
+        <EditText
+            android:id="@+id/edTotalPedido"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="75dp"
+            android:layout_marginLeft="75dp"
+            android:layout_marginTop="4dp"
+            android:ems="10"
+            android:inputType="numberDecimal"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/tvTotal2"
+            app:layout_constraintTop_toBottomOf="@+id/edFechaPedido" />
+
+        <Button
+            android:id="@+id/btnCambiarEstado"
+            android:layout_width="93dp"
+            android:layout_height="38dp"
+            android:layout_marginTop="16dp"
+            android:text="cambiar"
+            android:textSize="10sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

@@ -1,32 +1,32 @@
 package arquitectura.trescapas.primerparcial.Presentacion;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.app.Dialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-import arquitectura.trescapas.primerparcial.DB.DBmigrations;
 import arquitectura.trescapas.primerparcial.Negocio.Nrepartidor;
 import arquitectura.trescapas.primerparcial.R;
+import arquitectura.trescapas.primerparcial.clases.Repartidor;
 
 public class Prepartidor extends AppCompatActivity {
-    EditText etNombre, etCelular, etApellido;
+    ImageButton btnFoto;
     RecyclerView rv1;
-    AdaptadorRepartidor aC;
+    AdaptadorRepartidor aR;
     Nrepartidor repartidor;
-    List<Map<String,Object>> list;
+    List<Repartidor> list;
 
     int pos;
 
@@ -38,66 +38,70 @@ public class Prepartidor extends AppCompatActivity {
 
         repartidor = new Nrepartidor(this);
         list = repartidor.getDatos();
-        etNombre = findViewById(R.id.editNombre);
-        etCelular = findViewById(R.id.editCelular);
-        etApellido = findViewById(R.id.editApellido);
         rv1 = findViewById(R.id.rv1);
 
         LinearLayoutManager l=new LinearLayoutManager(this);
         rv1.setLayoutManager(l);
-        aC = new AdaptadorRepartidor();
-        rv1.setAdapter(aC);
+        aR = new AdaptadorRepartidor();
+        rv1.setAdapter(aR);
     }
 
-    public void agregar(View v) {
-        String nombre= etNombre.getText().toString();
-        String apellido=  etApellido.getText().toString();
-        String celular= etCelular.getText().toString();
+    public void agregarRepartidor(View v) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage("Crear Repartidor");
+        View selector = getLayoutInflater().inflate(R.layout.modalcrearusuario,null);
+        builder.setView(selector);
 
-        Map<String, Object> data = new HashMap<>();
+        EditText etNombre = selector.findViewById(R.id.editNombreC);
+        EditText etApellido  = selector.findViewById(R.id.editApellidoC);
+        EditText etCelular = selector.findViewById(R.id.editCelularC);
+        EditText etPlaca = selector.findViewById(R.id.editLink);
+        etPlaca.setHint("Placa");
+        btnFoto = selector.findViewById(R.id.imageButtonC);
 
-        data.put(DBmigrations.CLIENTE_NOMBRE,nombre);
-        data.put(DBmigrations.CLIENTE_APELLIDO,apellido);
-        data.put(DBmigrations.CLIENTE_CELULAR,celular);
+        btnFoto.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+//                Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+//                startActivityForResult(intent,CAPTURA_IMAGEN);
+
+            }
+
+        });
 
 
-        if (repartidor.saveDatos(data)){
-            listar();
-            rv1.scrollToPosition(list.size()-1);
-            Toast.makeText(this, "repartidor creado", Toast.LENGTH_SHORT).show();
+        builder.setPositiveButton("crear", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
 
-        }else {
-            Toast.makeText(this, "repartidor ya existente", Toast.LENGTH_SHORT).show();
-        }
+                String nombre= etNombre.getText().toString();
+                String apellido=  etApellido.getText().toString();
+                String celular= etCelular.getText().toString();
+                String placa= etPlaca.getText().toString();
+
+                Repartidor rp = Repartidor.crear("",nombre,apellido,celular,placa);
+                repartidor.saveDatos(rp);
+                listar();
+                rv1.scrollToPosition(list.size()-1);
+
+            }
+        });
+
+        builder.setNegativeButton("cancelar", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+            }
+        });
+
+        Dialog dialogo = builder.create();
+        dialogo.show();
 
     }
 
-    public void mostrar(int position) {
-        etNombre.setText(list.get(position).get(DBmigrations.CLIENTE_NOMBRE).toString());
-        etApellido.setText(list.get(position).get(DBmigrations.CLIENTE_APELLIDO).toString());
-        etCelular.setText(list.get(position).get(DBmigrations.CLIENTE_CELULAR).toString());
-        this.pos = position;
-    }
-    public void actualizar(View v) {
-        String nombre= etNombre.getText().toString();
-        String apellido=  etApellido.getText().toString();
-        String celular= etCelular.getText().toString();
-
-        String id = list.get(this.pos).get("id").toString();
-        //Toast.makeText(Pcliente.this, id, Toast.LENGTH_SHORT).show();
-
-        Map<String, Object> data = new HashMap<>();
-        data.put(DBmigrations.CLIENTE_ID,id);
-        data.put(DBmigrations.CLIENTE_NOMBRE,nombre);
-        data.put(DBmigrations.CLIENTE_APELLIDO,apellido);
-        data.put(DBmigrations.CLIENTE_CELULAR,celular);
-        repartidor.updateDatos(data);
-        listar();
-
-    }
     public void listar() {
         this.list = repartidor.getDatos();
-        aC.notifyDataSetChanged();
+        aR.notifyDataSetChanged();
     }
 
     private class AdaptadorRepartidor extends RecyclerView.Adapter<Prepartidor.AdaptadorRepartidor.AdaptadorRepartidorHolder> {
@@ -121,51 +125,107 @@ public class Prepartidor extends AppCompatActivity {
             return list.size();
         }
 
-        public class AdaptadorRepartidorHolder extends RecyclerView.ViewHolder  implements View.OnClickListener {
+        public class AdaptadorRepartidorHolder extends RecyclerView.ViewHolder  {
 
-            TextView tv1, tv2, tv3;
-            Button btnEliminar;
+            EditText edNombre, edApellido, edCelular, edPlaca;
+            TextView tvPlaca;
+            ImageButton btnEliminar, btnEditar;
 
             public AdaptadorRepartidorHolder(@NonNull View itemView) {
                 super(itemView);
-                tv1 = itemView.findViewById(R.id.tvEstado);
-                tv2 = itemView.findViewById(R.id.tvCliente);
-                tv3 = itemView.findViewById(R.id.tvRepartidor);
+                edNombre = itemView.findViewById(R.id.edNombreU);
+                edApellido = itemView.findViewById(R.id.edApellidoU);
+                edCelular = itemView.findViewById(R.id.edCelularU);
+                edPlaca = itemView.findViewById(R.id.edLinkU);
                 btnEliminar =  itemView.findViewById(R.id.btnEliminar);
-                itemView.setOnClickListener(this);
+                btnEditar = itemView.findViewById(R.id.btnEdit);
+                tvPlaca = itemView.findViewById(R.id.tvGenerico1U);
+
+
+                tvPlaca.setText("Placa:");
 
                 btnEliminar.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        onClickEliminar();
+                        eliminar();
                     }
                 });
 
+                btnEditar.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        editar();
+                    }
+                });
             }
 
             public void imprimir(int position) {
                 list = repartidor.getDatos();
-                tv1.setText(list.get(position).get("nombre").toString());
-                tv2.setText(list.get(position).get("apellido").toString());
-                tv3.setText(list.get(position).get("celular").toString());
-
+                edNombre.setText(list.get(position).getNombre());
+                edApellido.setText(list.get(position).getApellido());
+                edCelular.setText(list.get(position).getCelular());
+                edPlaca.setText(list.get(position).getPlaca());
             }
 
 
-            @Override
-            public void onClick(View v) {
-                int position = getLayoutPosition();
-                mostrar(position);
+
+
+            private void editar() {
+                AlertDialog.Builder builder = new AlertDialog.Builder(Prepartidor.this);
+                builder.setMessage("Desea guardar los cambios?");
+
+                builder.setPositiveButton("Confirmar", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        int position = getLayoutPosition();
+                        list = repartidor.getDatos();
+                        Repartidor repartidorActual = list.get(position);
+
+                        repartidorActual.setNombre(edNombre.getText().toString());
+                        repartidorActual.setApellido(edApellido.getText().toString());
+                        repartidorActual.setCelular(edCelular.getText().toString());
+                        repartidorActual.setPlaca(edPlaca.getText().toString());
+
+                        repartidor.updateDatos(repartidorActual);
+                    }
+                });
+
+                builder.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                    }
+                });
+
+                builder.create().show();
+
             }
 
-            private void onClickEliminar() {
-                int position = getLayoutPosition();
-                if (position != RecyclerView.NO_POSITION) {
-                    String id = list.get(getLayoutPosition()).get("id").toString();
-                    repartidor.delete(id);
-                    listar();
-                    Toast.makeText(Prepartidor.this, "eliminado", Toast.LENGTH_SHORT).show();
-                }
+            private void eliminar() {
+                AlertDialog.Builder builder = new AlertDialog.Builder(Prepartidor.this);
+                builder.setMessage("Esta seguro que desea Eliminar este Repartidor?");
+
+                builder.setPositiveButton("Confirmar", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        int position = getLayoutPosition();
+                        if (position != RecyclerView.NO_POSITION) {
+                            String id = list.get(getLayoutPosition()).getId();
+                            repartidor.delete(id);
+                            listar();
+                        }
+                    }
+                });
+
+                builder.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                    }
+                });
+
+                builder.create().show();
+
             }
         }
     }

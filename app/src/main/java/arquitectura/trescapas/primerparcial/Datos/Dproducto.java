@@ -1,6 +1,8 @@
 package arquitectura.trescapas.primerparcial.Datos;
 
+import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 
 import java.util.HashMap;
 import java.util.List;
@@ -8,69 +10,43 @@ import java.util.Map;
 
 import arquitectura.trescapas.primerparcial.DB.DBmanager1;
 import arquitectura.trescapas.primerparcial.DB.DBmigrations;
+import arquitectura.trescapas.primerparcial.DB.Dato;
 import arquitectura.trescapas.primerparcial.Utils.IDatos1;
+import arquitectura.trescapas.primerparcial.clases.Cliente;
+import arquitectura.trescapas.primerparcial.clases.Producto;
 
-public class Dproducto implements IDatos1 {
-    private DBmanager1 db;
+public class Dproducto extends Dato<Producto> {
 
-//    private String id;
-//    private String nombre;
-//    private String descripcion;
-//    private String precio;
-//    private String categoriaId;
-//    private String foto;
-
-    private Map<String,Object> row;
-
-    public Dproducto(Context context) {
-        this.db = new DBmanager1(context);
-        this.row = new HashMap<>();
-
-        row.put(DBmigrations.PRODUCTO_ID,"");
-        row.put(DBmigrations.PRODUCTO_NOMBRE,"");
-        row.put(DBmigrations.PRODUCTO_DESCRIPCION,"");
-        row.put(DBmigrations.PRODUCTO_PRECIO,"");
-        row.put(DBmigrations.PRODUCTO_CATEGORIAID,"");
-        row.put(DBmigrations.PRODUCTO_FOTO,"");
-    }
-
-
-    public void setData(Map<String, Object> data) {
-        this.row.putAll(data);
-    }
-
-
-    @Override
-    public boolean save( ) {
-        return db.insert(DBmigrations.TABLA_PRODUCTO,this.row);
+    public Dproducto(Context constext) {
+        super(constext);
+        super.tabla = DBmigrations.TABLA_PRODUCTO;
     }
 
     @Override
-    public void update(Map<String, Object> data) {
+    protected ContentValues getContentValues(Producto data) {
+        ContentValues values = new ContentValues();
 
-        db.updateData(DBmigrations.TABLA_PRODUCTO,  data);
+        if (data.getId() != "") {
+            values.put(DBmigrations.PRODUCTO_ID, data.getId());
+        }
+        values.put(DBmigrations.PRODUCTO_NOMBRE, data.getNombre());
+        values.put(DBmigrations.PRODUCTO_DESCRIPCION, data.getDescripcion());
+        values.put(DBmigrations.PRODUCTO_PRECIO, data.getPrecio());
+        values.put(DBmigrations.PRODUCTO_FOTO, data.getFoto());
+        values.put(DBmigrations.PRODUCTO_CATEGORIAID, data.getCategoriaId());
+
+        return values;
     }
 
     @Override
-    public void delete(String id) {
-        this.row.put("id",id);
-        db.deleteData(DBmigrations.TABLA_PRODUCTO, this.row.get("id").toString());
-    }
-
-    @Override
-    public Dproducto getById(String id) {
-        Map<String,Object> producto =db.getById(DBmigrations.TABLA_PRODUCTO,this.row,id);
-        this.row.putAll(producto);
-        return this;
-    }
-
-    @Override
-    public List<Map<String,Object>> getAll() {
-        return db.selectAll(DBmigrations.TABLA_PRODUCTO,this.row);
-    }
-
-
-    public  Map<String,Object> row() {
-        return this.row;
+    protected Producto getdata(Cursor cursor) {
+        Producto producto = new Producto();
+        producto.setId(cursor.getString(cursor.getColumnIndexOrThrow(DBmigrations.PRODUCTO_ID)));
+        producto.setNombre(cursor.getString(cursor.getColumnIndexOrThrow(DBmigrations.PRODUCTO_NOMBRE)));
+        producto.setDescripcion(cursor.getString(cursor.getColumnIndexOrThrow(DBmigrations.PRODUCTO_DESCRIPCION)));
+        producto.setPrecio(cursor.getString(cursor.getColumnIndexOrThrow(DBmigrations.PRODUCTO_PRECIO)));
+        producto.setFoto(cursor.getString(cursor.getColumnIndexOrThrow(DBmigrations.PRODUCTO_FOTO)));
+        producto.setCategoriaId(cursor.getString(cursor.getColumnIndexOrThrow(DBmigrations.PRODUCTO_CATEGORIAID)));
+        return producto;
     }
 }

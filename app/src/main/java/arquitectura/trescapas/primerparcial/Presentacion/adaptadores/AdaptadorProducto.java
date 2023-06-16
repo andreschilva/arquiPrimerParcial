@@ -1,10 +1,8 @@
 package arquitectura.trescapas.primerparcial.Presentacion.adaptadores;
 
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,15 +17,11 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.io.FileInputStream;
-import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import arquitectura.trescapas.primerparcial.DB.DBmigrations;
-import arquitectura.trescapas.primerparcial.EditarProducto;
-import arquitectura.trescapas.primerparcial.PdetallePedido;
-import arquitectura.trescapas.primerparcial.Presentacion.Ppedido;
 import arquitectura.trescapas.primerparcial.R;
 
 public class AdaptadorProducto extends RecyclerView.Adapter<AdaptadorProducto.AdaptadorProductoHolder> {
@@ -113,10 +107,10 @@ public class AdaptadorProducto extends RecyclerView.Adapter<AdaptadorProducto.Ad
 
         public AdaptadorProductoHolder(@NonNull View itemView) {
             super(itemView);
-            tv1 = itemView.findViewById(R.id.tvNombre);
-            tv2 = itemView.findViewById(R.id.tvDescripcion);
-            tv3 = itemView.findViewById(R.id.tvPrecio);
-            tv4 = itemView.findViewById(R.id.tvCategoria);
+            tv1 = itemView.findViewById(R.id.edNombreP);
+            tv2 = itemView.findViewById(R.id.edDescripcionP);
+            tv3 = itemView.findViewById(R.id.edPrecioP);
+            tv4 = itemView.findViewById(R.id.edCategoriaP);
             edCantidad = itemView.findViewById(R.id.edCantidad);
             checkBox = itemView.findViewById(R.id.cBProductos);
             btnEliminar =  itemView.findViewById(R.id.btnEliminar);

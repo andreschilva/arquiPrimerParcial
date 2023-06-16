@@ -1,95 +1,124 @@
 package arquitectura.trescapas.primerparcial.Presentacion;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.app.Dialog;
+import android.content.DialogInterface;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.SearchView;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.google.android.gms.common.api.Api;
-
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.stream.Collectors;
 
-import arquitectura.trescapas.primerparcial.DB.DBmigrations;
 import arquitectura.trescapas.primerparcial.Negocio.Ncliente;
-import arquitectura.trescapas.primerparcial.Negocio.Ncliente1;
 import arquitectura.trescapas.primerparcial.R;
 import arquitectura.trescapas.primerparcial.clases.Cliente;
 
-public class Pcliente extends AppCompatActivity {
-    EditText etNombre, etCelular, etApellido,etLink;
+public class Pcliente extends AppCompatActivity implements SearchView.OnQueryTextListener {
+    ImageButton btnFoto;
     RecyclerView rv1;
     AdaptadorCliente aC;
-    Ncliente1 cliente;
-    List<Cliente> list;
+    Ncliente cliente;
+    List<Cliente> listClientes;
+    SearchView buscador;
 
-    int pos;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_pcliente);
         //getSupportActionBar().setTitle("Clientes");
 
-        cliente = new Ncliente1(this);
-        list = cliente.getDatos();
-        etNombre = findViewById(R.id.editNombre);
-        etCelular = findViewById(R.id.editCelular);
-        etApellido = findViewById(R.id.editApellido);
-        etLink = findViewById(R.id.editLink);
+        buscador = findViewById(R.id.searchView);
+        cliente = new Ncliente(this);
+        listClientes = cliente.getDatos();
         rv1 = findViewById(R.id.rv1);
-
         LinearLayoutManager l=new LinearLayoutManager(this);
         rv1.setLayoutManager(l);
         aC = new AdaptadorCliente();
         rv1.setAdapter(aC);
+        buscador.setOnQueryTextListener(this);
+    }
+
+
+    public void agregarCliente(View v) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage("Crear Cliente");
+        View selector = getLayoutInflater().inflate(R.layout.modalcrearusuario,null);
+        builder.setView(selector);
+
+        EditText etNombre = selector.findViewById(R.id.editNombreC);
+        EditText etApellido  = selector.findViewById(R.id.editApellidoC);
+        EditText etCelular = selector.findViewById(R.id.editCelularC);
+        EditText etLink = selector.findViewById(R.id.editLink);
+        btnFoto = selector.findViewById(R.id.imageButtonC);
+
+        btnFoto.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+//                Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+//                startActivityForResult(intent,CAPTURA_IMAGEN);
+
+            }
+
+        });
+
+
+        builder.setPositiveButton("crear", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+                String nombre= etNombre.getText().toString();
+                String apellido=  etApellido.getText().toString();
+                String celular= etCelular.getText().toString();
+                String ubicacion= etLink.getText().toString();
+
+                Cliente cl = Cliente.crear("",nombre,apellido,celular,ubicacion);
+                cliente.saveDatos(cl);
+                listar();
+                rv1.scrollToPosition(listClientes.size()-1);
+
+            }
+        });
+
+        builder.setNegativeButton("cancelar", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+            }
+        });
+
+        Dialog dialogo = builder.create();
+        dialogo.show();
 
     }
 
-    public void agregar(View v) {
-        String nombre= etNombre.getText().toString();
-        String apellido=  etApellido.getText().toString();
-        String celular= etCelular.getText().toString();
-        String ubicacion= etLink.getText().toString();
 
-        Cliente cl = Cliente.crear("",nombre,apellido,celular,ubicacion);
-        cliente.saveDatos(cl);
-        listar();
-        rv1.scrollToPosition(list.size()-1);
-    }
-
-    public void mostrar(int position) {
-        etNombre.setText(list.get(position).getNombre());
-        etApellido.setText(list.get(position).getApellido());
-        etCelular.setText(list.get(position).getCelular());
-        this.pos = position;
-    }
-    public void actualizar(View v) {
-        String nombre= etNombre.getText().toString();
-        String apellido=  etApellido.getText().toString();
-        String celular= etCelular.getText().toString();
-
-        String id = list.get(this.pos).getId();
-        //Toast.makeText(Pcliente.this, id, Toast.LENGTH_SHORT).show();
-
-        Cliente cl = new Cliente();
-        cl.crear(id,nombre,apellido,celular,"");
-        cliente.updateDatos(cl);
-        listar();
-
-    }
     public void listar() {
-        this.list = cliente.getDatos();
+        this.listClientes = cliente.getDatos();
         aC.notifyDataSetChanged();
     }
+
+    @Override
+    public boolean onQueryTextSubmit(String query) {
+        return false;
+    }
+
+    @Override
+    public boolean onQueryTextChange(String newText) {
+       aC.filter(newText);
+        return  false;
+    }
+
 
     private class AdaptadorCliente extends RecyclerView.Adapter<AdaptadorCliente.AdaptadorClienteHolder> {
 
@@ -109,61 +138,140 @@ public class Pcliente extends AppCompatActivity {
 
         @Override
         public int getItemCount() {
-            return list.size();
+            return listClientes.size();
         }
+
+        public void filter(String strBusqueda){
+            if (strBusqueda.length() == 0){
+                listClientes = cliente.getDatos();
+            }
+            else {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                    listClientes.clear();
+                    List<Cliente> collect = cliente.getDatos().stream()
+                            .filter(cliente -> cliente.getNombre().toLowerCase().contains(strBusqueda))
+                            .collect(Collectors.toList());
+
+
+                    listClientes.addAll(collect);
+                }
+                else {
+                    listClientes.clear();
+                    for (Cliente cl: cliente.getDatos()) {
+                        if (cl.getNombre().toLowerCase().contains(strBusqueda)){
+                            listClientes.add(cl);
+                        }
+                    }
+                }
+            }
+            notifyDataSetChanged();
+        }
+
 
         public class AdaptadorClienteHolder extends RecyclerView.ViewHolder  implements View.OnClickListener {
 
-            TextView tv1, tv2, tv3;
-            Button btnEliminar;
+            TextView edNombre, edApellido, edCelular, edLink;
+            ImageButton btnEliminar, btnEditar;
 
             public AdaptadorClienteHolder(@NonNull View itemView) {
                 super(itemView);
-                tv1 = itemView.findViewById(R.id.tvEstado);
-                tv2 = itemView.findViewById(R.id.tvCliente);
-                tv3 = itemView.findViewById(R.id.tvRepartidor);
+                edNombre = itemView.findViewById(R.id.edNombreU);
+                edApellido = itemView.findViewById(R.id.edApellidoU);
+                edCelular = itemView.findViewById(R.id.edCelularU);
+                edLink = itemView.findViewById(R.id.edLinkU);
                 btnEliminar =  itemView.findViewById(R.id.btnEliminar);
+                btnEditar = itemView.findViewById(R.id.btnEdit);
                 itemView.setOnClickListener(this);
 
                 btnEliminar.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        onClickEliminar();
+                        eliminar();
+                    }
+                });
+
+                btnEditar.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        editar();
                     }
                 });
 
             }
 
+
+
             public void imprimir(int position) {
-                list = cliente.getDatos();
-                tv1.setText(list.get(position).getNombre());
-                tv2.setText(list.get(position).getApellido());
-                tv3.setText(list.get(position).getCelular());
-
+                //listClientes = cliente.getDatos();
+                edNombre.setText(listClientes.get(position).getNombre());
+                edApellido.setText(listClientes.get(position).getApellido());
+                edCelular.setText(listClientes.get(position).getCelular());
+                edLink.setText(listClientes.get(position).getUbicacion());
             }
-
-//            public void eliminar(View v) {
-//                list = cliente.getDatos();
-//                String id =  list.get(getLayoutPosition()).get("id").toString();
-//                cliente.delete(id);
-//            }
-
 
 
             @Override
             public void onClick(View v) {
-                int position = getLayoutPosition();
-                mostrar(position);
+                //int position = getLayoutPosition();
+                //mostrar(position);
             }
 
-            private void onClickEliminar() {
-                int position = getLayoutPosition();
-                if (position != RecyclerView.NO_POSITION) {
-                    String id = list.get(getLayoutPosition()).getId();
-                    cliente.delete(id);
-                    listar();
-                    Toast.makeText(Pcliente.this, "eliminado", Toast.LENGTH_SHORT).show();
-                }
+            private void editar() {
+                AlertDialog.Builder builder = new AlertDialog.Builder(Pcliente.this);
+                builder.setMessage("Desea guardar los cambios?");
+
+                builder.setPositiveButton("Confirmar", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        int position = getLayoutPosition();
+                        //listClientes = cliente.getDatos();
+                        Cliente clienteActual = listClientes.get(position);
+
+                        clienteActual.setNombre(edNombre.getText().toString());
+                        clienteActual.setApellido(edApellido.getText().toString());
+                        clienteActual.setCelular(edCelular.getText().toString());
+                        clienteActual.setUbicacion(edLink.getText().toString());
+
+                        cliente.updateDatos(clienteActual);
+                    }
+                });
+
+                builder.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                    }
+                });
+
+                builder.create().show();
+
+            }
+
+            private void eliminar() {
+                AlertDialog.Builder builder = new AlertDialog.Builder(Pcliente.this);
+                builder.setMessage("Esta seguro que desea Eliminar este Cliente?");
+
+                builder.setPositiveButton("Confirmar", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        int position = getLayoutPosition();
+                        if (position != RecyclerView.NO_POSITION) {
+                            String id = listClientes.get(getLayoutPosition()).getId();
+                            cliente.delete(id);
+                            listar();
+                        }
+                    }
+                });
+
+                builder.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                    }
+                });
+
+                builder.create().show();
+
             }
         }
     }

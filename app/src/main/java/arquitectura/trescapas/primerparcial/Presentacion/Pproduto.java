@@ -1,5 +1,6 @@
 package arquitectura.trescapas.primerparcial.Presentacion;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -11,30 +12,38 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.widget.ArrayAdapter;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import arquitectura.trescapas.primerparcial.DB.DBmigrations;
 import arquitectura.trescapas.primerparcial.Negocio.Ncategoria;
 import arquitectura.trescapas.primerparcial.Negocio.Nproducto;
-import arquitectura.trescapas.primerparcial.Presentacion.adaptadores.AdaptadorProducto;
 import arquitectura.trescapas.primerparcial.R;
+import arquitectura.trescapas.primerparcial.Utils.Utils;
+import arquitectura.trescapas.primerparcial.clases.Categoria;
+import arquitectura.trescapas.primerparcial.clases.Producto;
+
 
 public class Pproduto extends AppCompatActivity{
     final int CAPTURA_IMAGEN = 1;
@@ -45,12 +54,11 @@ public class Pproduto extends AppCompatActivity{
 
     Nproducto producto;
     Ncategoria categoria;
-    List<Map<String,Object>> listProductos;
-    List<Map<String,Object>> lisCategorias;
+    List<Producto> listProductos;
+    List<Categoria> lisCategorias;
     List<Map<String,Object>> lisProductoCategoria;
-    List<Map<String,Object>> listProductosSeleccionados;
-
-    //int pos;
+    List<Producto> listProductosSeleccionados;
+    Bitmap bitmap;
 
     String nombreFoto;
     @Override
@@ -64,93 +72,15 @@ public class Pproduto extends AppCompatActivity{
         categoria = new Ncategoria(this);
         listProductos = producto.getDatos();
         lisCategorias = categoria.getDatos();
-        unirtListaProductoCategoria();
         listProductosSeleccionados = new ArrayList<>();
 
         rv1 = findViewById(R.id.rv1);
 
         LinearLayoutManager l = new LinearLayoutManager(this);
         rv1.setLayoutManager(l);
-        aP = new AdaptadorProducto(this,listProductosSeleccionados, lisProductoCategoria);
-        eliminarProducto();
-        editarProducto();
+        aP = new AdaptadorProducto();
         rv1.setAdapter(aP);
 
-    }
-
-    private void eliminarProducto() {
-        aP.setOnClickListenerBtnEliminar(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(Pproduto.this);
-                builder.setMessage("Esta seguro que desea Eliminar este producto?");
-
-                builder.setPositiveButton("Confirmar", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        int position = aP.getPosition();
-                        if (position != RecyclerView.NO_POSITION) {
-                            String id = listProductos.get(position).get("id").toString();
-                            producto.delete(id);
-                            listar();
-                            Toast.makeText(Pproduto.this, "eliminado", Toast.LENGTH_SHORT).show();
-                        }
-
-                    }
-                });
-
-                builder.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-
-                    }
-                });
-
-                builder.create().show();
-            }
-        });
-    }
-    private void editarProducto() {
-        aP.setOnClickListenerBtnEdit(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(Pproduto.this);
-                builder.setMessage("Desea Guardar Los Cambios?");
-
-                builder.setPositiveButton("Confirmar", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        Map<String, Object> data = aP.getProductoSeleccionado();
-                        producto.updateDatos(data);
-                        listar();
-                    }
-                });
-
-                builder.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-
-                    }
-                });
-
-                builder.create().show();
-            }
-        });
-    }
-
-
-    private void unirtListaProductoCategoria() {
-        lisProductoCategoria = new ArrayList<>() ;
-        for (Map<String,Object> productoActual: listProductos ) {
-            String categoriaId = productoActual.get(DBmigrations.PRODUCTO_CATEGORIAID).toString();
-            for (Map<String,Object> categoriaActual: lisCategorias ) {
-                if (categoriaId.compareTo(categoriaActual.get(DBmigrations.CATEGORIA_ID).toString()) == 0) {
-                    productoActual.put("nombreCategoria",categoriaActual.get(DBmigrations.CATEGORIA_NOMBRE));
-                    break;
-                }
-            }
-            lisProductoCategoria.add(productoActual);
-        }
     }
 
     public void agregarProducto(View v) {
@@ -164,69 +94,59 @@ public class Pproduto extends AppCompatActivity{
         EditText edNombre = selector.findViewById(R.id.editNombreP);
         EditText edDescripcion = selector.findViewById(R.id.editDescripcionP);
         EditText edPrecio = selector.findViewById(R.id.editPrecioP);
-        btnFoto = selector.findViewById(R.id.imageButton);
+        btnFoto = selector.findViewById(R.id.imageButtonP);
 
         btnFoto.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                startActivityForResult(intent,CAPTURA_IMAGEN);
+//                Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+//                startActivityForResult(intent,CAPTURA_IMAGEN);
+                Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+               // intent.setType("image/");
+                startActivityForResult(intent.createChooser(intent,"Seleccione la Aplicacion"),1);
+
 
             }
 
         });
 
-        int i=0;
-        String [] arrayCategorias = new String[lisCategorias.size()];
-
-        for (Map<String,Object> mapCategoria : lisCategorias) {
-            arrayCategorias[i] = mapCategoria.get("nombre").toString();
-            i++;
-        }
-
-
-        ArrayAdapter<String> adapterCategorias = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item,arrayCategorias);
+        ArrayAdapter<String> adapterCategorias = getStringArrayAdapter();
         spCategoria.setAdapter(adapterCategorias);
 
 
         builder.setPositiveButton("crear", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
+                try {
+                    String nombre= edNombre.getText().toString();
+                    String descripcion=  edDescripcion.getText().toString();
+                    String precio= edPrecio.getText().toString();
+                    long positionCategoria= spCategoria.getSelectedItemPosition();
+                    Categoria categoriaSeleccionada = lisCategorias.get((int) positionCategoria);
 
-                String nombre= edNombre.getText().toString();
-                String descripcion=  edDescripcion.getText().toString();
-                String precio= edPrecio.getText().toString();
-                long positionCategoria= spCategoria.getSelectedItemPosition();
-                Map<String, Object> categoriaSeleccionada = lisCategorias.get((int) positionCategoria);
+                    nombreFoto = crearNombreArchivoJPG();
+                    guardarFoto();
 
+                    Producto data = new Producto("",nombre,descripcion,precio,nombreFoto,categoriaSeleccionada.getId());
+                    producto.saveDatos(data);
+                    nombreFoto = null;
 
-                //Toast.makeText(this,  lisCategorias.get((int) position).get("nombre").toString(), Toast.LENGTH_SHORT).show();
-
-                Map<String, Object> data = new HashMap<>();
-
-                data.put(DBmigrations.PRODUCTO_NOMBRE,nombre);
-                data.put(DBmigrations.PRODUCTO_DESCRIPCION,descripcion);
-                data.put(DBmigrations.PRODUCTO_PRECIO,precio);
-                data.put(DBmigrations.PRODUCTO_CATEGORIAID,categoriaSeleccionada.get("id"));
-                data.put(DBmigrations.PRODUCTO_FOTO,nombreFoto);
-
-
-                if (producto.saveDatos(data)){
                     listar();
                     rv1.scrollToPosition(listProductos.size()-1);
-                    Toast.makeText(Pproduto.this, "Producto creado", Toast.LENGTH_SHORT).show();
-
-                }else {
-                    Toast.makeText(Pproduto.this, "Producto ya existente", Toast.LENGTH_SHORT).show();
+                }catch (Exception e) {
+                    Utils.mensaje(Pproduto.this, e.getMessage());
                 }
-
             }
+
+
         });
 
         builder.setNegativeButton("cancelar", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-
+//                File file = new File(getFilesDir(), nombreFoto);
+//                boolean deleted = file.delete();
+                nombreFoto = null;
             }
         });
 
@@ -235,24 +155,60 @@ public class Pproduto extends AppCompatActivity{
 
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode==CAPTURA_IMAGEN && resultCode==RESULT_OK)
-        {
-            Bundle extras = data.getExtras();
-            Bitmap bitmap1 = (Bitmap)extras.get("data");
-            btnFoto.setImageBitmap(bitmap1);
+    protected ArrayAdapter<String> getStringArrayAdapter() {
+        int i=0;
+        String [] arrayCategorias = new String[lisCategorias.size()];
 
-            try {
-                nombreFoto = crearNombreArchivoJPG();
-                FileOutputStream fos = openFileOutput(nombreFoto, Context.MODE_PRIVATE);
-                bitmap1.compress(Bitmap.CompressFormat.JPEG,100,fos);
-                fos.close();
-            }catch (Exception e) {
-
-            }
+        for (Categoria mapCategoria : lisCategorias) {
+            arrayCategorias[i] = mapCategoria.getNombre();
+            i++;
         }
+
+
+        return new ArrayAdapter<>(this, android.R.layout.simple_spinner_item,arrayCategorias);
+    }
+    protected void guardarFoto() throws IOException {
+        FileOutputStream fos = openFileOutput(nombreFoto, Context.MODE_PRIVATE);
+        bitmap.compress(Bitmap.CompressFormat.JPEG,100,fos);
+        fos.close();
+    }
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data)  {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == RESULT_OK) {
+        // La foto se ha seleccionado exitosamente, puedes obtener la imagen desde 'data' y guardarla en tu tabla
+            Uri path = data.getData();
+            bitmap = Utils.getBitmapFromUri(this,path);
+            int targetWidth = btnFoto.getWidth();
+            int targetHeight = btnFoto.getHeight();
+            Bitmap resizedBitmap = Bitmap.createScaledBitmap(bitmap, targetWidth, targetHeight, false);
+            btnFoto.setImageBitmap(resizedBitmap);
+
+        // Guardar la foto en tu tabla
+//            try {
+//                nombreFoto = crearNombreArchivoJPG();
+//                FileOutputStream fos = openFileOutput(nombreFoto, Context.MODE_PRIVATE);
+//                bitmap.compress(Bitmap.CompressFormat.JPEG,100,fos);
+//                fos.close();
+//            }catch (Exception e) {
+//
+//            }
+         }
+//        if (requestCode==CAPTURA_IMAGEN && resultCode==RESULT_OK)
+//        {
+//            Bundle extras = data.getExtras();
+//            Bitmap bitmap1 = (Bitmap)extras.get("data");
+//            btnFoto.setImageBitmap(bitmap1);
+//
+//            try {
+//                nombreFoto = crearNombreArchivoJPG();
+//                FileOutputStream fos = openFileOutput(nombreFoto, Context.MODE_PRIVATE);
+//                bitmap1.compress(Bitmap.CompressFormat.JPEG,100,fos);
+//                fos.close();
+//            }catch (Exception e) {
+//
+//            }
+//        }
     }
 
     private String crearNombreArchivoJPG() {
@@ -260,65 +216,8 @@ public class Pproduto extends AppCompatActivity{
         return fecha+".jpg";
     }
 
-    //    public void agregar(View v) {
-//        String nombre= etNombre.getText().toString();
-//        String apellido=  etDescripcion.getText().toString();
-//        String celular= etPrecio.getText().toString();
-//        long position = spCategoria.getSelectedItemId();
-//        //Toast.makeText(this,  lisCategorias.get((int) position).get("nombre").toString(), Toast.LENGTH_SHORT).show();
-//        Map<String, Object> data = new HashMap<>();
-//
-//        data.put(DBmigrations.PRODUCTO_NOMBRE,nombre);
-//        data.put(DBmigrations.PRODUCTO_DESCRIPCION,apellido);
-//        data.put(DBmigrations.PRODUCTO_PRECIO,celular);
-//        data.put(DBmigrations.PRODUCTO_CATEGORIAID,lisCategorias.get((int) position).get("id").toString());
-//
-//
-//
-//        if (producto.saveDatos(data)){
-//            listar();
-//            rv1.scrollToPosition(listProductos.size()-1);
-//            Toast.makeText(this, "Producto creado", Toast.LENGTH_SHORT).show();
-//
-//        }else {
-//            Toast.makeText(this, "Producto ya existente", Toast.LENGTH_SHORT).show();
-//        }
-//
-//    }
-
-    public void mostrar(int position) {
-//        etNombre.setText(listProductos.get(position).get(DBmigrations.PRODUCTO_NOMBRE).toString());
-//        etDescripcion.setText(listProductos.get(position).get(DBmigrations.PRODUCTO_DESCRIPCION).toString());
-//        etPrecio.setText(listProductos.get(position).get(DBmigrations.PRODUCTO_PRECIO).toString());
-//        String idcategoria =listProductos.get(position).get(DBmigrations.PRODUCTO_CATEGORIAID).toString();
-//        //String nombreCategoria= categoria.getDcategoriaById(idcategoria).row();
-//        int posCategoria = lisCategorias.indexOf(categoria.getDcategoriaById(idcategoria).row());
-//        spCategoria.setSelection(posCategoria);
-//        //Toast.makeText(this,  posCategoria, Toast.LENGTH_SHORT).show();
-//        this.pos = position;
-    }
-//    public void actualizar(View v) {
-//        String nombre= etNombre.getText().toString();
-//        String apellido=  etDescripcion.getText().toString();
-//        String celular= etPrecio.getText().toString();
-//        long position = spCategoria.getSelectedItemId();
-//        String id = listProductos.get(this.pos).get("id").toString();
-//
-//
-//        Map<String, Object> data = new HashMap<>();
-//        data.put(DBmigrations.PRODUCTO_ID,id);
-//        data.put(DBmigrations.PRODUCTO_NOMBRE,nombre);
-//        data.put(DBmigrations.PRODUCTO_DESCRIPCION,apellido);
-//        data.put(DBmigrations.PRODUCTO_PRECIO,celular);
-//        data.put(DBmigrations.PRODUCTO_CATEGORIAID,lisCategorias.get((int)position).get("id").toString());
-//        producto.updateDatos(data);
-//        listar();
-//
-//    }
-    public void listar() {
+   public void listar() {
         this.listProductos = producto.getDatos();
-        unirtListaProductoCategoria();
-        aP.setListProductos(this.lisProductoCategoria);
         aP.notifyDataSetChanged();
     }
 
@@ -329,10 +228,10 @@ public class Pproduto extends AppCompatActivity{
         mensaje.append("Lista de productos:\n");
 
         double total = 0.0;
-        for (Map<String, Object> producto : this.listProductosSeleccionados) {
-            String nombre =  producto.get("nombre").toString();
-            double precio =Double.parseDouble( producto.get("precio").toString());
-            int cantidad = Integer.parseInt(producto.get("cantidad").toString());
+        for (Producto producto : this.listProductosSeleccionados) {
+            String nombre =  producto.getNombre();
+            double precio =Double.parseDouble( producto.getPrecio());
+            int cantidad = 1;
 
             mensaje.append("Nombre: ").append(nombre).append("\n");
             mensaje.append("Precio: ").append(precio).append("\n");
@@ -353,6 +252,224 @@ public class Pproduto extends AppCompatActivity{
 //        }else {
 //            Toast.makeText(this, "Whasapp no esta instalado en tu dispositivo", Toast.LENGTH_SHORT).show();
 //        }
+    }
+
+    private class AdaptadorProducto extends RecyclerView.Adapter<AdaptadorProducto.AdaptadorProductoHolder> {
+
+        @NonNull
+        @Override
+        public AdaptadorProducto.AdaptadorProductoHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+            return new AdaptadorProducto.AdaptadorProductoHolder(getLayoutInflater().inflate(R.layout.item_producto,parent,false));
+        }
+
+        @Override
+        public void onBindViewHolder(@NonNull AdaptadorProducto.AdaptadorProductoHolder holder, int position) {
+            holder.imprimir(position);
+        }
+
+        @Override
+        public int getItemCount() {
+            return listProductos.size();
+        }
+
+        public class AdaptadorProductoHolder extends RecyclerView.ViewHolder  {
+            Spinner edCategoria;
+            TextView edNombre, edDescripcion, edPrecio, edCantidad;
+            CheckBox checkBox;
+            ImageButton btnEliminar, btnEditar, ivFoto;
+
+            public AdaptadorProductoHolder(@NonNull View itemView) {
+                super(itemView);
+                edNombre = itemView.findViewById(R.id.edNombreP);
+                edDescripcion = itemView.findViewById(R.id.edDescripcionP);
+                edPrecio = itemView.findViewById(R.id.edPrecioP);
+                edCategoria = itemView.findViewById(R.id.edCategoriaP);
+                edCantidad = itemView.findViewById(R.id.edCantidad);
+                checkBox = itemView.findViewById(R.id.cBProductos);
+                btnEliminar =  itemView.findViewById(R.id.btnEliminar);
+                btnEditar =  itemView.findViewById(R.id.btnEdit);
+                ivFoto = itemView.findViewById(R.id.iv1);
+
+                ArrayAdapter<String> adapterCategorias = new ArrayAdapter<String>(Pproduto.this, android.R.layout.simple_spinner_item,categoria.getNombresCategorias());
+                edCategoria.setAdapter(adapterCategorias);
+
+                btnEliminar.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        eliminar();
+                    }
+                });
+
+                btnEditar.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        editar();
+                    }
+                });
+                checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                    @Override
+                    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                        onCheckedCotizacion();
+                    }
+                });
+
+                ivFoto.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        cambiarFoto();
+                    }
+                });
+
+            }
+
+            private void cambiarFoto() {
+                btnFoto = ivFoto;
+                Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                // intent.setType("image/");
+                startActivityForResult(intent.createChooser(intent,"Seleccione la Aplicacion"),1);
+                nombreFoto = crearNombreArchivoJPG();
+            }
+
+
+            public void imprimir(int position) {
+                try {
+
+                    //listProductos = producto.getDatos();
+                    Producto productoActual = listProductos.get(position);
+
+                    String fotoActual = productoActual.getFoto();
+                    FileInputStream fileInputStream = openFileInput(fotoActual);
+                    Bitmap bitmap = BitmapFactory.decodeStream(fileInputStream);
+
+                    ivFoto.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+                        @Override
+                        public void onGlobalLayout() {
+                            // Elimina el listener para evitar llamadas adicionales
+                            ivFoto.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+
+                            // Obtiene las dimensiones del ImageView
+                            int targetWidth = ivFoto.getWidth();
+                            int targetHeight = ivFoto.getHeight();
+
+                            // Crea el nuevo Bitmap redimensionado
+                            Bitmap resizedBitmap = Bitmap.createScaledBitmap(bitmap, targetWidth, targetHeight, false);
+
+                            // Asigna el nuevo Bitmap redimensionado al ImageView
+                            ivFoto.setImageBitmap(resizedBitmap);
+                        }
+                    });
+
+                    //ivFoto.setImageBitmap(resizedBitmap);
+                    fileInputStream.close();
+
+                    edNombre.setText(productoActual.getNombre());
+                    edDescripcion.setText(productoActual.getDescripcion());
+                    edPrecio.setText(productoActual.getPrecio());
+
+                    String categoriaId = productoActual.getCategoriaId();
+                    Categoria categoriaActual = categoria.getById(categoriaId);
+                    int posCategoria = lisCategorias.indexOf(categoriaActual);
+                    edCategoria.setSelection(posCategoria);
+
+                }catch (Exception e) {
+                    Utils.mensaje(Pproduto.this,e.getMessage());
+                }
+
+            }
+
+
+            private void editar() {
+                AlertDialog.Builder builder = new AlertDialog.Builder(Pproduto.this);
+                builder.setMessage("Desea guardar los cambios?");
+
+                builder.setPositiveButton("Confirmar", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        int position = getLayoutPosition();
+                        //listProductos = producto.getDatos();
+                        Producto productoActual = listProductos.get(position);
+
+                        productoActual.setNombre(edNombre.getText().toString());
+                        productoActual.setDescripcion(edDescripcion.getText().toString());
+                        productoActual.setPrecio(edPrecio.getText().toString());
+
+                        long positionCategoria= edCategoria.getSelectedItemPosition();
+                        Categoria categoriaSeleccionada = lisCategorias.get((int) positionCategoria);
+                        productoActual.setCategoriaId(categoriaSeleccionada.getId());
+
+                        if (nombreFoto != null) {
+                            try {
+                                File file = new File(getFilesDir(), productoActual.getFoto());
+                                file.delete();
+
+                                productoActual.setFoto(nombreFoto);
+                                guardarFoto();
+                            }catch (Exception e){
+                                Utils.mensaje(Pproduto.this,e.getMessage());
+                            }
+                        }
+
+                        producto.updateDatos(productoActual);
+                        listar();
+                        nombreFoto = null;
+                    }
+                });
+
+                builder.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                    }
+                });
+
+                builder.create().show();
+
+            }
+
+            private void eliminar() {
+                AlertDialog.Builder builder = new AlertDialog.Builder(Pproduto.this);
+                builder.setMessage("Esta seguro que desea Eliminar este producto?");
+
+                builder.setPositiveButton("Confirmar", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        int position = getLayoutPosition();
+                        if (position != RecyclerView.NO_POSITION) {
+                            Producto productoActual = listProductos.get(position);
+                            String id = productoActual.getId();
+                            //eliminar foto
+                            File file = new File(getFilesDir(), productoActual.getFoto());
+                            file.delete();
+                            //eliminar producto
+                            producto.delete(id);
+                            listar();
+                        }
+
+                    }
+                });
+
+                builder.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                    }
+                });
+
+                builder.create().show();
+
+            }
+
+            private void onCheckedCotizacion() {
+                if (checkBox.isChecked()) {
+                    Producto productoActual = listProductos.get(getLayoutPosition());
+                    //productoActual.put("cantidad", edCantidad.getText());
+                    listProductosSeleccionados.add(productoActual);
+                }
+                else {
+                    listProductosSeleccionados.remove(listProductos.get(getLayoutPosition()));
+                }
+            }
+        }
     }
 
 }

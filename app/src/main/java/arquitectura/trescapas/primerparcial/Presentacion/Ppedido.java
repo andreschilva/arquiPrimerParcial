@@ -10,7 +10,6 @@ import android.app.DatePickerDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
@@ -19,22 +18,22 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Spinner;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-import arquitectura.trescapas.primerparcial.DB.DBmigrations;
+import arquitectura.trescapas.primerparcial.Datos.Dpedido;
 import arquitectura.trescapas.primerparcial.Negocio.Ncliente;
 import arquitectura.trescapas.primerparcial.Negocio.Npedido;
 import arquitectura.trescapas.primerparcial.Negocio.Nproducto;
 import arquitectura.trescapas.primerparcial.Negocio.Nrepartidor;
 import arquitectura.trescapas.primerparcial.PdetallePedido;
 import arquitectura.trescapas.primerparcial.R;
+import arquitectura.trescapas.primerparcial.clases.Cliente;
+import arquitectura.trescapas.primerparcial.clases.Pedido;
+import arquitectura.trescapas.primerparcial.clases.Producto;
+import arquitectura.trescapas.primerparcial.clases.Repartidor;
 
 public class Ppedido extends AppCompatActivity {
     RecyclerView rv1;
@@ -47,12 +46,15 @@ public class Ppedido extends AppCompatActivity {
     Nrepartidor repartidor;
 
     //listas
-    List<Map<String,Object>> listProductos;
-    List<Map<String,Object>> listPedidos;
-    List<Map<String,Object>> listClientes;
-    List<Map<String,Object>> listRepartidores;
-    List<Map<String,Object>> listProductosSeleccionados;
-    String [] arrayEstados = {"En proceso","entregado"};
+    List<Producto> listProductos;
+    List<Dpedido> listPedidos;
+    List<Cliente> listClientes;
+    List<Repartidor> listRepartidores;
+    List<Pproduto> listProductosSeleccionados;
+    String [] arrayEstados = {"En proceso","finalizado","cancelado"};
+    List<String> listEstados = new ArrayList<>();
+
+
 
 
     int pos;
@@ -62,8 +64,6 @@ public class Ppedido extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_ppedido);
         //getSupportActionBar().setTitle("Pedidos");
-
-
 
         producto = new Nproducto(this);
         cliente = new Ncliente(this);
@@ -76,6 +76,7 @@ public class Ppedido extends AppCompatActivity {
         listRepartidores = repartidor.getDatos();
         listPedidos = pedido.getDatos();
         listProductosSeleccionados = new ArrayList<>();
+        listEstados.add("En proceso");
 
 
         rv1 = findViewById(R.id.rv1);
@@ -112,24 +113,8 @@ public class Ppedido extends AppCompatActivity {
             }
         });
 
-        int i=0;
-        String [] arrayClientes = new String[listClientes.size()];
-
-        for (Map<String,Object> mapcliente : listClientes) {
-            arrayClientes[i] = mapcliente.get("nombre").toString();
-            i++;
-        }
-        i=0;
-        String [] arrayRepartidores = new String[listRepartidores.size()];
-
-        for (Map<String,Object> mapRepartidor : listRepartidores) {
-            arrayRepartidores[i] = mapRepartidor.get("nombre").toString();
-            i++;
-        }
-
-
-        ArrayAdapter<String> adapterClientes = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item,arrayClientes);
-        ArrayAdapter<String> adapterRepartidores = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item,arrayRepartidores);
+        ArrayAdapter<String> adapterClientes = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item,cliente.getNombresClientes());
+        ArrayAdapter<String> adapterRepartidores = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item,repartidor.getNombresRepartidores());
         ArrayAdapter<String> adapterEstados = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item,arrayEstados);
 
         sp1.setAdapter(adapterEstados);
@@ -143,29 +128,24 @@ public class Ppedido extends AppCompatActivity {
                 long positionCliente= sp2.getSelectedItemPosition();
                 long positionRepartidor= sp3.getSelectedItemPosition();
 
-                Map<String, Object> clienteSeleccionado = listClientes.get((int) positionCliente);
-                Map<String, Object> repartidorSeleccionado = listRepartidores.get((int) positionRepartidor);
+                Cliente clienteSeleccionado = listClientes.get((int) positionCliente);
+                Repartidor repartidorSeleccionado = listRepartidores.get((int) positionRepartidor);
                 String estadoSeleccionado = arrayEstados[(int) positionEstado];
                 String fecha = ed1Fecha.getText().toString();
                 String total = ed2Total.getText().toString();
 
 
                 //Toast.makeText(this,  listClientes.get((int) position).get("nombre").toString(), Toast.LENGTH_SHORT).show();
-                Map<String, Object> data = new HashMap<>();
-                data.put(DBmigrations.PEDIDO_ESTADO,estadoSeleccionado);
-                data.put(DBmigrations.PEDIDO_FECHA,fecha);
-                data.put(DBmigrations.PEDIDO_TOTAL,total);
-                data.put(DBmigrations.PEDIDO_CLIENTE_ID,clienteSeleccionado.get("id").toString());
-                data.put(DBmigrations.PEDIDO_REPARTIDOR_ID,repartidorSeleccionado.get("id").toString());
-
-                if (pedido.saveDatos(data)){
+                Pedido data = new Pedido();
+                data.setEstado(estadoSeleccionado);
+                data.setFecha(fecha);
+                data.setTotal(total);
+                data.setClienteId(clienteSeleccionado.getId());
+                data.setRepartidorId(repartidorSeleccionado.getId());
+                Dpedido dPedido = new Dpedido(Ppedido.this,data);
+                pedido.saveDatos(dPedido);
                     listar();
                     rv1.scrollToPosition(listPedidos.size()-1);
-                    Toast.makeText(Ppedido.this, "Pedido creado", Toast.LENGTH_SHORT).show();
-
-                }else {
-                    Toast.makeText(Ppedido.this, "Pedido ya existente", Toast.LENGTH_SHORT).show();
-                }
             }
         });
 
@@ -181,36 +161,6 @@ public class Ppedido extends AppCompatActivity {
     }
 
 
-//    public void mostrar(int position) {
-//        etNombre.setText(listProductos.get(position).get(DBmigrations.PRODUCTO_NOMBRE).toString());
-//        etDescripcion.setText(listProductos.get(position).get(DBmigrations.PRODUCTO_DESCRIPCION).toString());
-//        etPrecio.setText(listProductos.get(position).get(DBmigrations.PRODUCTO_PRECIO).toString());
-//        String idcategoria =listProductos.get(position).get(DBmigrations.PRODUCTO_CATEGORIAID).toString();
-//        //String nombreCategoria= categoria.getDcategoriaById(idcategoria).row();
-//        int posCategoria = listClientes.indexOf(cliente.getDcategoriaById(idcategoria).row());
-//        spCategoria.setSelection(posCategoria);
-//        //Toast.makeText(this,  posCategoria, Toast.LENGTH_SHORT).show();
-//        this.pos = position;
-//    }
-
-    public void actualizar(View v) {
-//        String nombre= etNombre.getText().toString();
-//        String apellido=  etDescripcion.getText().toString();
-//        String celular= etPrecio.getText().toString();
-//        long position = spCategoria.getSelectedItemId();
-//        String id = listProductos.get(this.pos).get("id").toString();
-//
-//
-//        Map<String, Object> data = new HashMap<>();
-//        data.put(DBmigrations.PRODUCTO_ID,id);
-//        data.put(DBmigrations.PRODUCTO_NOMBRE,nombre);
-//        data.put(DBmigrations.PRODUCTO_DESCRIPCION,apellido);
-//        data.put(DBmigrations.PRODUCTO_PRECIO,celular);
-//        data.put(DBmigrations.PRODUCTO_CATEGORIAID,lisCategorias.get((int)position).get("id").toString());
-//        producto.updateDatos(data);
-//        listar();
-
-    }
     public void listar() {
         this.listPedidos = pedido.getDatos();
         aP.notifyDataSetChanged();
@@ -238,30 +188,56 @@ public class Ppedido extends AppCompatActivity {
             return listPedidos.size();
         }
 
-        public class AdaptadorPedidoHolder extends RecyclerView.ViewHolder  implements View.OnClickListener {
+        public class AdaptadorPedidoHolder extends RecyclerView.ViewHolder  {
 
-            TextView tv1, tv2, tv3,tv4, tv5;
-            Button btnEliminar, btnDetalles;
-
+            Spinner spEstado, spCliente, spRepartidor;
+            EditText edFecha, edTotal;
+            Button  btnDetalles, btnCambiarEstado;
+            ImageButton btnEliminar, btnEdit,btnFecha;
             public AdaptadorPedidoHolder(@NonNull View itemView) {
                 super(itemView);
-                tv1 = itemView.findViewById(R.id.tvEstado);
-                tv2 = itemView.findViewById(R.id.tvCliente);
-                tv3 = itemView.findViewById(R.id.tvRepartidor);
-                tv4 = itemView.findViewById(R.id.tvFecha);
-                tv5 = itemView.findViewById(R.id.tvTotal);
-
+                spEstado = itemView.findViewById(R.id.spEstadoPedido);
+                spCliente = itemView.findViewById(R.id.spClientePedido);
+                spRepartidor = itemView.findViewById(R.id.spRepartidorPedido);
+                edFecha = itemView.findViewById(R.id.edFechaPedido);
+                edTotal = itemView.findViewById(R.id.edTotalPedido);
                 btnEliminar =  itemView.findViewById(R.id.btnEliminar);
-                itemView.setOnClickListener(this);
-
-//                btnEliminar.setOnClickListener(new View.OnClickListener() {
-//                    @Override
-//                    public void onClick(View v) {
-//                        onClickEliminar();
-//                    }
-//                });
-
+                btnEdit = itemView.findViewById(R.id.btnSave);
                 btnDetalles = itemView.findViewById(R.id.btnDetalles);
+                btnFecha = itemView.findViewById(R.id.btnFecha);
+                btnCambiarEstado = itemView.findViewById(R.id.btnCambiarEstado);
+
+                cargarSpinners();
+                eventos();
+
+            }
+
+            public void cargarSpinners() {
+                ArrayAdapter<String> adapterEstados = new ArrayAdapter<String>(Ppedido.this, android.R.layout.simple_spinner_item,arrayEstados);
+                spEstado.setAdapter(adapterEstados);
+
+                ArrayAdapter<String> adapterClientes = new ArrayAdapter<String>(Ppedido.this, android.R.layout.simple_spinner_item,cliente.getNombresClientes());
+                spCliente.setAdapter(adapterClientes);
+
+                ArrayAdapter<String> adapterRepartidores = new ArrayAdapter<String>(Ppedido.this, android.R.layout.simple_spinner_item,repartidor.getNombresRepartidores());
+                spRepartidor.setAdapter(adapterRepartidores);
+            }
+
+            public void eventos() {
+                btnEliminar.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        eliminar();
+                    }
+                });
+
+                btnEdit.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        editar();
+                    }
+                });
+
                 btnDetalles.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -269,54 +245,153 @@ public class Ppedido extends AppCompatActivity {
                     }
                 });
 
+                btnFecha.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        DatePickerDialog d = new DatePickerDialog(Ppedido.this, new DatePickerDialog.OnDateSetListener() {
+                            @Override
+                            public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
+                                edFecha.setText(dayOfMonth+"/"+month+"/"+year);
+                            }
+                        },2023,0,1);
+                        d.show();
+                    }
+                });
+
+                btnCambiarEstado.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        cambiarEstado();
+                    }
+
+                });
+
+
+            }
+
+            private void cambiarEstado() {
+                int position = getLayoutPosition();
+                Dpedido pedidoActual = listPedidos.get(position);
+
+                long positionEstado = spEstado.getSelectedItemPosition();
+                String estadoSeleccionado = arrayEstados[(int) positionEstado];
+
+                if (estadoSeleccionado.equals("En proceso")){
+                   pedidoActual.enProceso();
+                }else if(estadoSeleccionado.equals("finalizado")){
+                    pedidoActual.finalizado();
+                }else{
+                    pedidoActual.cancelado();
+                }
+            }
+
+
+            public void imprimir(int position) {
+                //listPedidos = pedido.getDatos();
+                Dpedido pedidoActual = listPedidos.get(position);
+
+                if (pedidoActual.getPedido().getEstado().equals("En proceso")){
+                    spEstado.setSelection(0);
+                }else if(pedidoActual.getPedido().getEstado().equals("finalizado")){
+                    spEstado.setSelection(1);
+                }else{
+                    spEstado.setSelection(2);
+                }
+
+                String idcliente = pedidoActual.getPedido().getClienteId();
+                Cliente clienteActual= cliente.getById(idcliente);
+                int posCliente = listClientes.indexOf(clienteActual);
+                spCliente.setSelection(posCliente);
+
+                String idRepartidor =pedidoActual.getPedido().getRepartidorId();
+                Repartidor repartidorActual= repartidor.getById(idRepartidor);
+                int posRepartidor = listRepartidores.indexOf(repartidorActual);
+                spRepartidor.setSelection(posRepartidor);
+
+                edFecha.setText(pedidoActual.getPedido().getFecha());
+                edTotal.setText(pedidoActual.getPedido().getTotal());
+
+            }
+
+
+            private void editar() {
+                AlertDialog.Builder builder = new AlertDialog.Builder(Ppedido.this);
+                builder.setMessage("Desea guardar los cambios?");
+
+                builder.setPositiveButton("Confirmar", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        int position = getLayoutPosition();
+
+                        Dpedido pedidoActual = listPedidos.get(position);
+
+                        long positionEstado = spEstado.getSelectedItemPosition();
+                        String estadoSeleccionado = arrayEstados[(int) positionEstado];
+                        pedidoActual.getPedido().setEstado(estadoSeleccionado);
+
+                        long posicionCliente = spCliente.getSelectedItemPosition();
+                        Cliente clienteSeleccionado = listClientes.get((int) posicionCliente);
+                        pedidoActual.getPedido().setClienteId(clienteSeleccionado.getId());
+
+                        long posicionRepartidor = spRepartidor.getSelectedItemPosition();
+                        String repartidorId = listRepartidores.get((int) posicionRepartidor).getId();
+                        pedidoActual.getPedido().setRepartidorId(repartidorId);
+
+                        pedidoActual.getPedido().setFecha(edFecha.getText().toString());
+                        pedidoActual.getPedido().setTotal(edTotal.getText().toString());
+
+                        pedido.updateDatos(pedidoActual);
+                        listar();
+                    }
+                });
+                builder.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                    }
+                });
+
+                builder.create().show();
+            }
+
+            private void eliminar() {
+                AlertDialog.Builder builder = new AlertDialog.Builder(Ppedido.this);
+                builder.setMessage("Esta seguro que desea Eliminar este pedido?");
+
+                builder.setPositiveButton("Confirmar", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        int position = getLayoutPosition();
+                        if (position != RecyclerView.NO_POSITION) {
+                            Dpedido pedidoActual = listPedidos.get(position);
+                            String id = pedidoActual.getId();
+
+                            //eliminar pedido
+                            pedido.delete(id);
+                            listar();
+                        }
+
+                    }
+                });
+
+                builder.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                    }
+                });
+
+                builder.create().show();
 
             }
 
             private void onClickDetalles() {
                 Intent intento = new Intent(Ppedido.this, PdetallePedido.class);
                 int position = getLayoutPosition();
-                Map<String,Object> pedidoSeleccionado = listPedidos.get(position);
-                Bundle bundle = new Bundle();
-                bundle.putSerializable("pedido", (Serializable) pedidoSeleccionado);
-                intento.putExtras(bundle);
-
+                String pedidoId = listPedidos.get(position).getId();
+                intento.putExtra("pedido", (Serializable) pedidoId);
                 startActivity(intento);
             }
-
-
-            public void imprimir(int position) {
-                listPedidos = pedido.getDatos();
-                tv1.setText(listPedidos.get(position).get(DBmigrations.PEDIDO_ESTADO).toString());
-
-                String idcliente =listPedidos.get(position).get(DBmigrations.PEDIDO_CLIENTE_ID).toString();
-                String nombreCliente= cliente.getById(idcliente).row().get("nombre").toString();
-                tv2.setText(nombreCliente);
-
-                String idRepartidor =listPedidos.get(position).get(DBmigrations.PEDIDO_REPARTIDOR_ID).toString();
-                String nombreRepartidor= repartidor.getById(idRepartidor).row().get("nombre").toString();
-                tv3.setText(nombreRepartidor);
-
-                tv4.setText(listPedidos.get(position).get(DBmigrations.PEDIDO_FECHA).toString());
-                tv5.setText(listPedidos.get(position).get(DBmigrations.PEDIDO_TOTAL).toString());
-
-            }
-
-
-            @Override
-            public void onClick(View v) {
-                int position = getLayoutPosition();
-                //mostrar(position);
-            }
-
-//            private void onClickEliminar() {
-//                int position = getLayoutPosition();
-//                if (position != RecyclerView.NO_POSITION) {
-//                    String id = listProductos.get(getLayoutPosition()).get("id").toString();
-//                    producto.delete(id);
-//                    listar();
-//                    Toast.makeText(Ppedido.this, "eliminado", Toast.LENGTH_SHORT).show();
-//                }
-//            }
         }
     }
 }

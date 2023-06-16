@@ -1,6 +1,8 @@
 package arquitectura.trescapas.primerparcial.Datos;
 
+import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 
 import java.util.HashMap;
 import java.util.List;
@@ -8,74 +10,40 @@ import java.util.Map;
 
 import arquitectura.trescapas.primerparcial.DB.DBmanager1;
 import arquitectura.trescapas.primerparcial.DB.DBmigrations;
+import arquitectura.trescapas.primerparcial.DB.Dato;
 import arquitectura.trescapas.primerparcial.Utils.IDatos1;
+import arquitectura.trescapas.primerparcial.clases.DetallePedido;
+import arquitectura.trescapas.primerparcial.clases.Pedido;
 
-public class DdetallePedido implements IDatos1 {
-    private DBmanager1 db;
+public class DdetallePedido extends Dato<DetallePedido> {
 
-    private String pedido_id;
-    private String producto_id;
-    private String cantidad;
-    private Map<String,Object> row;
-
-    public DdetallePedido(Context context) {
-        this.db = new DBmanager1(context);
-        this.row = new HashMap<>();
-
-        row.put(DBmigrations.DETALLE_PEDIDO_ID,"");
-        row.put(DBmigrations.DETALLE_PEDIDO_PEDIDO_ID,"");
-        row.put(DBmigrations.DETALLE_PEDIDO_PRODUCTO_ID,"");
-        row.put(DBmigrations.DETALLE_PEDIDO_CANTIDAD,"");
-
-    }
-
-
-
-    public void setData(Map<String, Object> data) {
-        this.row.putAll(data);
-
-    }
-
-//    public void setData(String nombre,String apellido, String celular) {
-//        this.nombre = nombre;
-//        this.apellido  = apellido;
-//        this.celular = celular;
-//    }
-
-    @Override
-    public boolean save( ) {
-        return db.insert(DBmigrations.TABLA_DETALLE_PEDIDO,this.row);
+    public DdetallePedido(Context constext) {
+        super(constext);
+        super.tabla = DBmigrations.TABLA_DETALLE_PEDIDO;
     }
 
     @Override
-    public void update(Map<String, Object> data) {
+    protected ContentValues getContentValues(DetallePedido data) {
+        ContentValues values = new ContentValues();
 
-        db.updateData(DBmigrations.TABLA_DETALLE_PEDIDO,  data);
+        if (data.getId() != "") {
+            values.put(DBmigrations.DETALLE_PEDIDO_ID, data.getId());
+        }
+        values.put(DBmigrations.DETALLE_PEDIDO_PEDIDO_ID, data.getPedidoId());
+        values.put(DBmigrations.DETALLE_PEDIDO_PRODUCTO_ID, data.getProductoId());
+        values.put(DBmigrations.DETALLE_PEDIDO_CANTIDAD, data.getCantidad());
+
+        return values;
     }
 
     @Override
-    public void delete(String id) {
-        this.row.put("id",id);
-        db.deleteData(DBmigrations.TABLA_DETALLE_PEDIDO, this.row.get("id").toString());
-    }
+    protected DetallePedido getdata(Cursor cursor) {
+        DetallePedido detallePedido = new DetallePedido();
 
-    @Override
-    public DdetallePedido getById(String id) {
-        Map<String,Object> detallePedido =db.getById(DBmigrations.TABLA_DETALLE_PEDIDO,this.row,id);
-        this.row.putAll(detallePedido);
-        return this;
-    }
-
-    @Override
-    public List<Map<String,Object>> getAll() {
-        return db.selectAll(DBmigrations.TABLA_DETALLE_PEDIDO,this.row);
-    }
-
-    public List<Map<String,Object>> query() {
-        return db.selectAll(DBmigrations.TABLA_DETALLE_PEDIDO,this.row);
-    }
-
-    public  Map<String,Object> row() {
-        return this.row;
+        detallePedido.setId(cursor.getString(cursor.getColumnIndexOrThrow(DBmigrations.DETALLE_PEDIDO_ID)));
+        detallePedido.setPedidoId(cursor.getString(cursor.getColumnIndexOrThrow(DBmigrations.DETALLE_PEDIDO_PEDIDO_ID)));
+        detallePedido.setProductoId(cursor.getString(cursor.getColumnIndexOrThrow(DBmigrations.DETALLE_PEDIDO_PRODUCTO_ID)));
+        detallePedido.setCantidad(cursor.getString(cursor.getColumnIndexOrThrow(DBmigrations.DETALLE_PEDIDO_CANTIDAD)));
+        return detallePedido;
     }
 }

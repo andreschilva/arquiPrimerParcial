@@ -9,32 +9,28 @@ import android.database.sqlite.SQLiteDatabase;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class Dato<T>  {
+import arquitectura.trescapas.primerparcial.interfaces.Identificable;
+
+public abstract class Dato<T extends Identificable>  {
     private DBconexion conexion;
-    private SQLiteDatabase basededatos;
+    protected SQLiteDatabase basededatos;
     //private static  DBmanager instance ;
     protected String tabla;
 
-    protected T obj;
     public Dato(Context constext) {
     this.conexion = new DBconexion(constext);
         this.open();
         this.close();
     }
 
-    private Dato open() throws SQLException {
+    protected void open() throws SQLException {
         basededatos = conexion.getWritableDatabase();
-
-        return this;
     }
 
-    private void close() {
+    protected void close() {
         conexion.close();
     }
 
-    public void setData(T obj) {
-        this.obj = obj;
-    }
 
     public Boolean save(T data) {
         try {
@@ -64,7 +60,7 @@ public abstract class Dato<T>  {
            this.close();
            return datos;
        }catch (Exception e){
-            System.out.println("error al obtener los datos" + e.getMessage());
+            System.out.println("error al obtener los datos " + e.getMessage());
        }
         return datos;
     }
@@ -75,10 +71,13 @@ public abstract class Dato<T>  {
         String [] SelectionArgs = {id};
         this.open();
         Cursor cursor = basededatos.query(this.tabla, null ,"id = ?",SelectionArgs,null,null,null);
-        T dato = getdata(cursor);
+        T dato = null;
+        while (cursor.moveToNext()) {
+             dato = getdata(cursor);
+        }
 
-        cursor.close();
-        return dato;
+            cursor.close();
+            return dato;
         }catch (Exception e) {
             System.out.println("error al actualizar los datos" + e.getMessage());
         }finally {
@@ -115,7 +114,9 @@ public abstract class Dato<T>  {
         return false;
     }
 
-    protected abstract String[] getArguments(T obj);
+    protected String[] getArguments(T data) {
+        return new String[]{data.getId().toString()};
+    }
     protected abstract ContentValues getContentValues(T data);
     protected abstract T getdata(Cursor cursor);
 

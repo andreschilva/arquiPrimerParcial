@@ -1,6 +1,8 @@
 package arquitectura.trescapas.primerparcial.clases;
 
-public abstract class Persona {
+import arquitectura.trescapas.primerparcial.interfaces.Identificable;
+
+public abstract class Persona implements Identificable {
     private String id;
     private String nombre;
     private String apellido;

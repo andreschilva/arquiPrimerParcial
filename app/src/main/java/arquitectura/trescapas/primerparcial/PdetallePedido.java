@@ -1,271 +1,270 @@
 package arquitectura.trescapas.primerparcial;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.Button;
-import android.widget.Toast;
+import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
+import android.widget.CheckBox;
+import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.TextView;
 
+import java.io.FileInputStream;
+import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-import arquitectura.trescapas.primerparcial.DB.DBmigrations;
-import arquitectura.trescapas.primerparcial.Datos.Dcliente;
-import arquitectura.trescapas.primerparcial.Datos.Drepartidor;
 import arquitectura.trescapas.primerparcial.Negocio.Ncategoria;
 import arquitectura.trescapas.primerparcial.Negocio.Ncliente;
 import arquitectura.trescapas.primerparcial.Negocio.NdetallePedido;
+import arquitectura.trescapas.primerparcial.Negocio.Npedido;
 import arquitectura.trescapas.primerparcial.Negocio.Nproducto;
 import arquitectura.trescapas.primerparcial.Negocio.Nrepartidor;
-import arquitectura.trescapas.primerparcial.Presentacion.Pcliente;
-import arquitectura.trescapas.primerparcial.Presentacion.adaptadores.AdaptadorProducto;
+import arquitectura.trescapas.primerparcial.Utils.Utils;
+import arquitectura.trescapas.primerparcial.clases.Categoria;
+import arquitectura.trescapas.primerparcial.clases.Cliente;
+import arquitectura.trescapas.primerparcial.clases.DetallePedido;
+import arquitectura.trescapas.primerparcial.clases.Pedido;
+import arquitectura.trescapas.primerparcial.clases.Producto;
+import arquitectura.trescapas.primerparcial.clases.Repartidor;
 
 public class PdetallePedido extends AppCompatActivity {
-    Map<String, Object> pedido;
+    Pedido pedido;
     NdetallePedido detallePedido;
-
+    Ncliente cliente;
+    Nrepartidor repartidor;
     Nproducto producto;
     Ncategoria categoria;
-    List<Map<String,Object>> listProductos;
-    List<Map<String,Object>> lisCategorias;
-    List<Map<String,Object>> listProductosSeleccionados;
-    List<Map<String,Object>>  lisProductoCategoria;
-    List<Map<String,Object>>  listDetallePedido;
-    List<Map<String,Object>>  listProductosDelPedido;
+    Npedido nPedido;
+
+    List<Producto> listProductos;
+    List<Categoria> lisCategorias;
+    List<DetallePedido> listDetallePedido;
+    List<Producto>  listProductosDelPedido;
     RecyclerView rv2;
     AdaptadorProducto aP2;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_pdetalle_pedido);
-        Intent intent = getIntent();
-        Bundle bundle = intent.getExtras();
-        pedido= (Map<String, Object>) bundle.getSerializable("pedido");
-
-        Toast.makeText(this, pedido.get("id").toString(), Toast.LENGTH_SHORT).show();
+        nPedido = new Npedido(this);
+        String pedidoId = getIntent().getStringExtra("pedido");
+        pedido= nPedido.getById(pedidoId).getPedido();
 
         producto = new Nproducto(this);
         categoria = new Ncategoria(this);
         detallePedido = new NdetallePedido(this);
+        cliente = new Ncliente(this);
+        repartidor = new Nrepartidor(this);
+
         listProductos = producto.getDatos();
         lisCategorias= categoria.getDatos();
         listDetallePedido = detallePedido.getDatos();
-        listProductosSeleccionados = new ArrayList<>();
-        lisProductoCategoria = new ArrayList<>();
-        unirtListaProductoCategoria();
         listProductosDelPedido = getListProductosDelPedido();
-
-        Dcliente cliente = new Ncliente(this).getById(pedido.get(DBmigrations.PEDIDO_CLIENTE_ID).toString());
-        Drepartidor repartidor = new Nrepartidor(this).getById(pedido.get(DBmigrations.PEDIDO_REPARTIDOR_ID).toString());
-
 
         rv2 = findViewById(R.id.rv2);
         LinearLayoutManager l=new LinearLayoutManager(this);
         rv2.setLayoutManager(l);
-        aP2= new AdaptadorProducto(this,null,listProductosDelPedido);
-        aP2.setDesactivarbtnEdit(true);
-        aP2.setDesactivarChBox(true);
+        aP2= new AdaptadorProducto();
         rv2.setAdapter(aP2);
 
     }
 
-
-
-    private void unirtListaProductoCategoria() {
-        for (Map<String,Object> productoActual: listProductos ) {
-            String categoriaId = productoActual.get(DBmigrations.PRODUCTO_CATEGORIAID).toString();
-            for (Map<String,Object> categoriaActual: lisCategorias ) {
-                if (categoriaId.compareTo(categoriaActual.get(DBmigrations.CATEGORIA_ID).toString()) == 0) {
-                    productoActual.put("nombreCategoria",categoriaActual.get(DBmigrations.CATEGORIA_NOMBRE));
-                    break;
-                }
-            }
-            lisProductoCategoria.add(productoActual);
-        }
-    }
-
-    private List<Map<String,Object>> getListProductosDelPedido() {
-        List<Map<String,Object>>  resultado = new ArrayList<>();
-        for (Map<String,Object> pedidoActual: listDetallePedido ) {
-            String pedidoId = pedidoActual.get(DBmigrations.DETALLE_PEDIDO_PEDIDO_ID).toString();
-            if (pedidoId.compareTo(pedido.get("id").toString()) == 0) {
-                String productoId = pedidoActual.get(DBmigrations.DETALLE_PEDIDO_PRODUCTO_ID).toString();
-                String cantidad = pedidoActual.get(DBmigrations.DETALLE_PEDIDO_CANTIDAD).toString();
-                for (Map<String,Object> productoActual: lisProductoCategoria ) {
-                    if (productoId.compareTo(productoActual.get(DBmigrations.PRODUCTO_ID).toString()) == 0) {
-                        productoActual.put(DBmigrations.DETALLE_PEDIDO_CANTIDAD,cantidad);
+    private List<Producto> getListProductosDelPedido() {
+        listDetallePedido = detallePedido.getDatos();
+        List<Producto>  resultado = new ArrayList<>();
+        for (DetallePedido pedidoActual: listDetallePedido ) {
+            String pedidoId = pedidoActual.getPedidoId();
+            if (pedidoId.equals(pedido.getId())) {
+                String productoId = pedidoActual.getProductoId();
+                String cantidad = pedidoActual.getCantidad();
+                for (Producto productoActual: listProductos ) {
+                    if (productoId.equals(productoActual.getId())) {
                         resultado.add(productoActual);
                         break;
                     }
                 }
             }
-
         }
         return resultado;
     }
 
     public void agregarProductos(View v) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage("Agregar Productos");
-        View selector = getLayoutInflater().inflate(R.layout.modalseleccionarproducto,null);
-        builder.setView(selector);
-
-        RecyclerView rv1 = selector.findViewById(R.id.rv2);
-        Button btnAgregar = selector.findViewById(R.id.btnAgregar);
-        Button btnCancelar = selector.findViewById(R.id.btncancelar);
-        LinearLayoutManager l=new LinearLayoutManager(this);
-        rv1.setLayoutManager(l);
-        AdaptadorProducto aP= new AdaptadorProducto(this,listProductosSeleccionados,lisProductoCategoria);
-        aP.setDesactivarbtnEliminar(true);
-        aP.setDesactivarbtnEdit(true);
-        rv1.setAdapter(aP);
-
-        AlertDialog dialog = builder.create();
-
-        btnAgregar.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                for (Map<String,Object> productoSeleccionado: listProductosSeleccionados) {
-                    Map<String,Object> mapDetallePedido = new HashMap<>();
-                    mapDetallePedido.put(DBmigrations.DETALLE_PEDIDO_PEDIDO_ID,pedido.get("id"));
-                    mapDetallePedido.put(DBmigrations.DETALLE_PEDIDO_PRODUCTO_ID,productoSeleccionado.get("id"));
-                    mapDetallePedido.put(DBmigrations.DETALLE_PEDIDO_CANTIDAD,productoSeleccionado.get("cantidad"));
-                    detallePedido.saveDatos(mapDetallePedido);
-                }
-                dialog.dismiss();
-            }
-        });
-
-        btnCancelar.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                dialog.dismiss();
-            }
-        });
-
-        dialog.show();
-
+        Intent intento = new Intent(PdetallePedido.this, EditarProducto.class);
+        intento.putExtra("pedido", (Serializable) pedido.getId());
+        startActivity(intento);
+        aP2.notifyDataSetChanged();
     }
 
-//    private class AdaptadorProducto extends RecyclerView.Adapter<AdaptadorProducto.AdaptadorProductoHolder> {
-//
-//        @NonNull
-//        @Override
-//        public AdaptadorProducto.AdaptadorProductoHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-//            return new AdaptadorProducto.AdaptadorProductoHolder(getLayoutInflater().inflate(R.layout.item_producto,parent,false));
+    public  void enviarDatosARepartidor(View v) {
+        Cliente clienteDelPedido= cliente.getById(pedido.getClienteId());
+        Repartidor repartidorDelPedido= repartidor.getById(pedido.getRepartidorId());
+        String numeroRepartidor = repartidorDelPedido.getCelular();
+        String ubicacionCliente = clienteDelPedido.getUbicacion();
+
+        StringBuilder mensaje = new StringBuilder();
+        mensaje.append("Lista de productos:\n");
+
+        double total = 0.0;
+        for (Producto producto : this.listProductosDelPedido) {
+            String nombre =  producto.getNombre();
+            double precio =Double.parseDouble( producto.getPrecio());
+            int cantidad = 1;
+
+            mensaje.append("Nombre: ").append(nombre).append("\n");
+            mensaje.append("Cantidad: ").append(cantidad).append("\n");
+            mensaje.append("-----------------\n");
+
+            total += precio*cantidad;
+        }
+        mensaje.append("Ubicacion: ").append("\n");
+        mensaje.append(ubicacionCliente).append("\n");
+        mensaje.append("Total a Cobrar: ").append(total).append("\n");
+
+        //Toast.makeText(this,  mensaje, Toast.LENGTH_SHORT).show();
+
+        //boolean installed = appInstalledOrNot("com.whatsapp");
+        //if (installed) {
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+        intent.setData(Uri.parse("http://api.whatsapp.com/send?phone="+"+591"+numeroRepartidor+ "&text="+mensaje));
+        startActivity(intent);
+//        }else {
+//            Toast.makeText(this, "Whasapp no esta instalado en tu dispositivo", Toast.LENGTH_SHORT).show();
 //        }
-//
-//        @Override
-//        public void onBindViewHolder(@NonNull AdaptadorProducto.AdaptadorProductoHolder holder, int position) {
-//
-//            holder.imprimir(position);
-//
-//
-//        }
-//
-//        @Override
-//        public int getItemCount() {
-//            return listProductos.size();
-//        }
-//
-//        public class AdaptadorProductoHolder extends RecyclerView.ViewHolder  implements View.OnClickListener {
-//
-//            TextView tv1, tv2, tv3,tv4;
-//            CheckBox chProductos;
-//            ImageButton btnEliminar, btnEdit;
-//            EditText edCantidad;
-//            ImageView ivFoto;
-//            public AdaptadorProductoHolder(@NonNull View itemView) {
-//                super(itemView);
-//                tv1 = itemView.findViewById(R.id.tvNombre);
-//                tv2 = itemView.findViewById(R.id.tvDescripcion);
-//                tv3 = itemView.findViewById(R.id.tvPrecio);
-//                tv4 = itemView.findViewById(R.id.tvCategoria);
-//                chProductos = itemView.findViewById(R.id.cBProductos);
-//                btnEliminar =  itemView.findViewById(R.id.btnEliminar);
-//                btnEdit =  itemView.findViewById(R.id.btnEdit);
-//                edCantidad = itemView.findViewById(R.id.edCantidad);
-//                ivFoto = itemView.findViewById(R.id.iv1);
-//                itemView.setOnClickListener(this);
-//
-//                chProductos.setText("Agregar");
-//                btnEliminar.setVisibility(View.GONE);
-//                btnEdit.setVisibility(View.GONE);
-//
-//                btnEliminar.setOnClickListener(new View.OnClickListener() {
-//                    @Override
-//                    public void onClick(View v) {
-//                        //onClickEliminar();
-//                    }
-//                });
-//
-//                chProductos.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-//                    @Override
-//                    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-//                        onCheckedProductos();
-//                    }
-//                });
-//
-//            }
-//
-//            private void onCheckedProductos() {
-//                if (chProductos.isChecked()) {
-//                    Map<String,Object> productoActual =  listProductos.get(getLayoutPosition());
-//                    productoActual.put("cantidad",edCantidad.getText());
-//                    listProductosSeleccionados.add(productoActual);
-//                }
-//                else {
-//                    listProductosSeleccionados.remove(listProductos.get(getLayoutPosition()));
-//                }
-//            }
-//
-//            public void imprimir(int position) {
-//                try {
-//                    listProductos = producto.getDatos();
-//                    Map<String,Object> productoActual = listProductos.get(position);
-//                    String fotoActual = productoActual.get(DBmigrations.PRODUCTO_FOTO).toString();
-//
-//                    FileInputStream fileInputStream = openFileInput(fotoActual);
-//                    Bitmap bitmap = BitmapFactory.decodeStream(fileInputStream);
-//                    ivFoto.setImageBitmap(bitmap);
-//                    fileInputStream.close();
-//
-//                    tv1.setText(productoActual.get("nombre").toString());
-//                    tv2.setText(productoActual.get("descripcion").toString());
-//                    tv3.setText(productoActual.get("precio").toString());
-//                    String idcategoria =productoActual.get("categoria_id").toString();
-//                    String nombreCategoria= categoria.getDcategoriaById(idcategoria).row().get("nombre").toString();
-//                    tv4.setText(nombreCategoria);
-//
-//                }catch (Exception e) {
-//
-//                }
-//            }
-//
-//
-//            @Override
-//            public void onClick(View v) {
-//                int position = getLayoutPosition();
-//                //mostrar(position);
-//            }
-//
-////            private void onClickEliminar() {
-////                int position = getLayoutPosition();
-////                if (position != RecyclerView.NO_POSITION) {
-////                    String id = listProductos.get(getLayoutPosition()).get("id").toString();
-////                    producto.delete(id);
-////                    listar();
-////                    Toast.makeText(Pproduto.this, "eliminado", Toast.LENGTH_SHORT).show();
-////                }
-////            }
-//        }
-//    }
+    }
+
+    public void listar() {
+        this.listProductosDelPedido = getListProductosDelPedido();
+        aP2.notifyDataSetChanged();
+    }
+
+    private class AdaptadorProducto extends RecyclerView.Adapter<AdaptadorProducto.AdaptadorProductoHolder> {
+
+        @NonNull
+        @Override
+        public AdaptadorProducto.AdaptadorProductoHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+            return new AdaptadorProducto.AdaptadorProductoHolder(getLayoutInflater().inflate(R.layout.itemseleccionarproductos,parent,false));
+        }
+
+        @Override
+        public void onBindViewHolder(@NonNull AdaptadorProducto.AdaptadorProductoHolder holder, int position) {
+            holder.imprimir(position);
+        }
+
+        @Override
+        public int getItemCount() {
+            return listProductosDelPedido.size();
+        }
+
+        public class AdaptadorProductoHolder extends RecyclerView.ViewHolder  {
+            TextView edNombre, edPrecio, edCantidad;
+            CheckBox checkBox;
+            ImageButton btnEliminar;
+            ImageView ivFoto;
+
+            public AdaptadorProductoHolder(@NonNull View itemView) {
+                super(itemView);
+                edNombre = itemView.findViewById(R.id.tvnombreDetalle);
+                edPrecio = itemView.findViewById(R.id.tvPrecioDetalle);
+                edCantidad = itemView.findViewById(R.id.edCantidadDetalle);
+                checkBox = itemView.findViewById(R.id.checkBoxDetalle);
+                ivFoto = itemView.findViewById(R.id.ivProductoDetalle);
+                btnEliminar = itemView.findViewById(R.id.btnEliminar);
+
+                checkBox.setVisibility(View.GONE);
+
+                btnEliminar.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        eliminar();
+                    }
+                });
+
+            }
+
+            public void imprimir(int position) {
+                try {
+
+                    Producto productoActual = listProductosDelPedido.get(position);
+                    String fotoActual = productoActual.getFoto();
+                    FileInputStream fileInputStream = openFileInput(fotoActual);
+                    Bitmap bitmap = BitmapFactory.decodeStream(fileInputStream);
+
+                    ivFoto.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+                        @Override
+                        public void onGlobalLayout() {
+                            // Elimina el listener para evitar llamadas adicionales
+                            ivFoto.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+
+                            // Obtiene las dimensiones del ImageView
+                            int targetWidth = ivFoto.getWidth();
+                            int targetHeight = ivFoto.getHeight();
+
+                            // Crea el nuevo Bitmap redimensionado
+                            Bitmap resizedBitmap = Bitmap.createScaledBitmap(bitmap, targetWidth, targetHeight, false);
+
+                            // Asigna el nuevo Bitmap redimensionado al ImageView
+                            ivFoto.setImageBitmap(resizedBitmap);
+                        }
+                    });
+
+                    //ivFoto.setImageBitmap(resizedBitmap);
+                    fileInputStream.close();
+
+                    edNombre.setText(productoActual.getNombre());
+                    edPrecio.setText(productoActual.getPrecio());
+                    edCantidad.setText(listDetallePedido.get(position).getCantidad());
+
+                }catch (Exception e) {
+                    Utils.mensaje(PdetallePedido.this,e.getMessage());
+                }
+
+            }
+
+            private void eliminar() {
+                AlertDialog.Builder builder = new AlertDialog.Builder(PdetallePedido.this);
+                builder.setMessage("Esta seguro que desea Eliminar este producto?");
+
+                builder.setPositiveButton("Confirmar", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        int position = getLayoutPosition();
+                        if (position != RecyclerView.NO_POSITION) {
+                            DetallePedido detallePedidoActual = listDetallePedido.get(position);
+                            String id = detallePedidoActual.getId();
+
+                            //eliminar detalle del pedido
+                            detallePedido.delete(id);
+                            listar();
+                        }
+
+                    }
+                });
+
+                builder.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                    }
+                });
+
+                builder.create().show();
+
+            }
+        }
+    }
 }
+
+

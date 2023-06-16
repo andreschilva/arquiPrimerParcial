@@ -26,6 +26,7 @@ public class DBmigrations {
     public static final String REPARTIDOR_NOMBRE = "nombre";
     public static final String REPARTIDOR_APELLIDO = "apellido";
     public static final String REPARTIDOR_CELULAR = "celular";
+    public static final String REPARTIDOR_PLACA = "placa";
 
     public static final String TABLA_REPARTIDOR_CREATE =
             "create table " + TABLA_REPARTIDOR +
@@ -33,7 +34,8 @@ public class DBmigrations {
                     + REPARTIDOR_ID + " integer not null primary key autoincrement, "
                     + REPARTIDOR_NOMBRE + " text not null, "
                     + REPARTIDOR_APELLIDO + " text not null, "
-                    + REPARTIDOR_CELULAR + " text not null)";
+                    + REPARTIDOR_CELULAR + " text not null, "
+                    + REPARTIDOR_PLACA + " text not null)";
 
     //TABLA CATEGORIA
     public static final String TABLA_CATEGORIA = "categorias";
@@ -109,7 +111,5 @@ public class DBmigrations {
                     + DETALLE_PEDIDO_CANTIDAD + " text not null, "
                     +"foreign key ("+DETALLE_PEDIDO_PEDIDO_ID+") references "+TABLA_PEDIDO+"(id) "
                     + "foreign key ("+DETALLE_PEDIDO_PRODUCTO_ID+") references "+TABLA_PRODUCTO+"(id) )";
-
-
-}
+    }
 

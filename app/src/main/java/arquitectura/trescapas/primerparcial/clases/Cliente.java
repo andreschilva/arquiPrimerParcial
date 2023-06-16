@@ -1,5 +1,7 @@
 package arquitectura.trescapas.primerparcial.clases;
 
+import androidx.annotation.Nullable;
+
 public class Cliente extends Persona{
     private String ubicacion;
 
@@ -34,5 +36,20 @@ public class Cliente extends Persona{
     @Override
     public Persona clone() {
         return new Cliente(this);
+    }
+
+    @Override
+    public int hashCode() {
+        return super.hashCode();
+    }
+
+    @Override
+    public boolean equals(@Nullable Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        Cliente cliente = (Cliente) obj;
+        return (this.getId().equals(cliente.getId()) && this.getNombre().equals(cliente.getNombre())
+        && this.getApellido().equals(cliente.getApellido()) && this.getCelular().equals(cliente.getCelular())
+        && this.getUbicacion().equals(cliente.getUbicacion()));
     }
 }

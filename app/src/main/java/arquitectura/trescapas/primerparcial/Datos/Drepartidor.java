@@ -1,6 +1,8 @@
 package arquitectura.trescapas.primerparcial.Datos;
 
+import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 
 import java.util.HashMap;
 import java.util.List;
@@ -8,70 +10,44 @@ import java.util.Map;
 
 import arquitectura.trescapas.primerparcial.DB.DBmanager1;
 import arquitectura.trescapas.primerparcial.DB.DBmigrations;
+import arquitectura.trescapas.primerparcial.DB.Dato;
 import arquitectura.trescapas.primerparcial.Utils.IDatos1;
+import arquitectura.trescapas.primerparcial.clases.Cliente;
+import arquitectura.trescapas.primerparcial.clases.Repartidor;
 
-public class Drepartidor implements IDatos1 {
-    private DBmanager1 db;
-
-    private String id;
-    private String nombre;
-    private String apellido;
-    private String celular;
-    private Map<String,Object> row;
+public class Drepartidor extends Dato<Repartidor> {
 
     public Drepartidor(Context context) {
-        this.db = new DBmanager1(context);
-        this.row = new HashMap<>();
-
-        row.put(DBmigrations.REPARTIDOR_ID,"");
-        row.put(DBmigrations.REPARTIDOR_NOMBRE,"");
-        row.put(DBmigrations.REPARTIDOR_APELLIDO,"");
-        row.put(DBmigrations.REPARTIDOR_CELULAR,"");
+        super(context);
+        super.tabla = DBmigrations.TABLA_REPARTIDOR;
     }
 
 
-    public void setData(Map<String, Object> data) {
-        this.row.putAll(data);
+    @Override
+    protected ContentValues getContentValues(Repartidor data) {
+        ContentValues values = new ContentValues();
 
-    }
-
-
-    public void setData(String nombre,String apellido, String celular) {
-        this.nombre = nombre;
-        this.apellido  = apellido;
-        this.celular = celular;
+        if (data.getId() != "") {
+            values.put(DBmigrations.REPARTIDOR_ID, data.getId());
+        }
+        values.put(DBmigrations.REPARTIDOR_NOMBRE, data.getNombre());
+        values.put(DBmigrations.REPARTIDOR_APELLIDO, data.getApellido());
+        values.put(DBmigrations.REPARTIDOR_CELULAR, data.getCelular());
+        values.put(DBmigrations.REPARTIDOR_PLACA, data.getPlaca());
+        return values;
     }
 
     @Override
-    public boolean save( ) {
-        return db.insert(DBmigrations.TABLA_REPARTIDOR,this.row);
-    }
+    protected Repartidor getdata(Cursor cursor) {
 
-    @Override
-    public void update(Map<String, Object> data) {
+        Repartidor repartidor = new Repartidor();
 
-        db.updateData(DBmigrations.TABLA_REPARTIDOR,  data);
-    }
+        repartidor.setId(cursor.getString(cursor.getColumnIndexOrThrow(DBmigrations.REPARTIDOR_ID)));
+        repartidor.setNombre(cursor.getString(cursor.getColumnIndexOrThrow(DBmigrations.REPARTIDOR_NOMBRE)));
+        repartidor.setApellido(cursor.getString(cursor.getColumnIndexOrThrow(DBmigrations.REPARTIDOR_APELLIDO)));
+        repartidor.setCelular(cursor.getString(cursor.getColumnIndexOrThrow(DBmigrations.REPARTIDOR_CELULAR)));
+        repartidor.setPlaca(cursor.getString(cursor.getColumnIndexOrThrow(DBmigrations.REPARTIDOR_PLACA)));
 
-    @Override
-    public void delete(String id) {
-        this.row.put("id",id);
-        db.deleteData(DBmigrations.TABLA_REPARTIDOR, this.row.get("id").toString());
-    }
-
-    @Override
-    public Drepartidor getById(String id) {
-        Map<String,Object> repartidor =db.getById(DBmigrations.TABLA_REPARTIDOR,this.row,id);
-        this.row.putAll(repartidor);
-        return this;
-    }
-
-    @Override
-    public List<Map<String,Object>> getAll() {
-        return db.selectAll(DBmigrations.TABLA_REPARTIDOR,this.row);
-    }
-
-    public  Map<String,Object> row() {
-        return this.row;
+        return  repartidor;
     }
 }

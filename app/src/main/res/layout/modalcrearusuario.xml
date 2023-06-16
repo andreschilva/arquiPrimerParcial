@@ -7,9 +7,9 @@
     android:padding="4dp">
 
     <ImageButton
-        android:id="@+id/imageButtonP"
-        android:layout_width="0dp"
-        android:layout_height="239dp"
+        android:id="@+id/imageButtonC"
+        android:layout_width="153dp"
+        android:layout_height="158dp"
         android:layout_marginTop="2dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -17,7 +17,7 @@
         app:srcCompat="@drawable/imagen" />
 
     <EditText
-        android:id="@+id/editNombreP"
+        android:id="@+id/editNombreC"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
@@ -26,53 +26,31 @@
         android:inputType="textPersonName"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/imageButtonP" />
+        app:layout_constraintTop_toBottomOf="@+id/imageButtonC" />
 
     <EditText
-        android:id="@+id/editDescripcionP"
+        android:id="@+id/editApellidoC"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:ems="10"
-        android:hint="Descripcion"
+        android:hint="Apellido"
         android:inputType="textPersonName"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/editNombreP" />
+        app:layout_constraintTop_toBottomOf="@+id/editNombreC" />
 
     <EditText
-        android:id="@+id/editPrecioP"
+        android:id="@+id/editCelularC"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:ems="10"
-        android:hint="Precio"
+        android:hint="Celular"
         android:inputType="numberDecimal"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/editDescripcionP" />
-
-    <Spinner
-        android:id="@+id/spCategoriaP"
-        style="@style/Widget.AppCompat.Spinner.Underlined"
-        android:theme="?attr/ratingBarStyle"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView4" />
-
-    <TextView
-        android:id="@+id/textView4"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:text="Categoria"
-        android:textSize="18sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/editPrecioP" />
+        app:layout_constraintTop_toBottomOf="@+id/editApellidoC" />
 
     <TextView
         android:id="@+id/textC"
@@ -85,4 +63,17 @@
         app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <EditText
+        android:id="@+id/editLink"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:hint="Link Ubicacion"
+        android:inputType="textPersonName"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/editCelularC"
+        app:layout_constraintVertical_bias="0.0" />
 </androidx.constraintlayout.widget.ConstraintLayout>

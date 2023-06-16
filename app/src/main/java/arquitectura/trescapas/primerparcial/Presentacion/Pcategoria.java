@@ -8,25 +8,22 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-import arquitectura.trescapas.primerparcial.DB.DBmigrations;
 import arquitectura.trescapas.primerparcial.Negocio.Ncategoria;
 import arquitectura.trescapas.primerparcial.R;
+import arquitectura.trescapas.primerparcial.clases.Categoria;
 
 public class Pcategoria extends AppCompatActivity {
     EditText etNombre;
     RecyclerView rv1;
     AdaptadorCategoria aC;
     Ncategoria categoria;
-    List<Map<String,Object>> list;
+    List<Categoria> list;
     int pos;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,38 +45,30 @@ public class Pcategoria extends AppCompatActivity {
     public void agregar(View v) {
         String nombre= etNombre.getText().toString();
 
+        Categoria data = new Categoria();
 
-        Map<String, Object> data = new HashMap<>();
-
-        data.put(DBmigrations.CATEGORIA_NOMBRE,nombre);
-
-
-        if (categoria.saveDatos(data)){
-            listar();
-            rv1.scrollToPosition(list.size()-1);
-            Toast.makeText(this, "categoria creado", Toast.LENGTH_SHORT).show();
-
-        }else {
-            Toast.makeText(this, "categoria ya existente", Toast.LENGTH_SHORT).show();
-        }
+        data.setId("");
+        data.setNombre(nombre);
+        categoria.saveDatos(data);
+        listar();
 
     }
 
     public void mostrar(int position) {
-        etNombre.setText(list.get(position).get(DBmigrations.CATEGORIA_NOMBRE).toString());
-
+        etNombre.setText(list.get(position).getNombre());
         this.pos = position;
     }
+
     public void actualizar(View v) {
         String nombre= etNombre.getText().toString();
 
 
-        String id = list.get(this.pos).get("id").toString();
+        String id = list.get(this.pos).getId();
         //Toast.makeText(Pcliente.this, id, Toast.LENGTH_SHORT).show();
 
-        Map<String, Object> data = new HashMap<>();
-        data.put(DBmigrations.CATEGORIA_ID,id);
-        data.put(DBmigrations.CATEGORIA_NOMBRE,nombre);
+        Categoria data = new Categoria();
+        data.setId(id);
+        data.setNombre(nombre);
         categoria.updateDatos(data);
         listar();
 
@@ -112,14 +101,12 @@ public class Pcategoria extends AppCompatActivity {
 
         public class AdaptadorCategoriaHolder extends RecyclerView.ViewHolder  implements View.OnClickListener {
 
-            TextView tv1, tv2, tv3;
-            Button btnEliminar;
+            TextView tv1;
+            ImageButton btnEliminar;
 
             public AdaptadorCategoriaHolder(@NonNull View itemView) {
                 super(itemView);
-                tv1 = itemView.findViewById(R.id.tvEstado);
-                tv2 = itemView.findViewById(R.id.tvCliente);
-                tv3 = itemView.findViewById(R.id.tvRepartidor);
+                tv1 = itemView.findViewById(R.id.edNombreC);
                 btnEliminar =  itemView.findViewById(R.id.btnEliminar);
                 itemView.setOnClickListener(this);
 
@@ -134,7 +121,7 @@ public class Pcategoria extends AppCompatActivity {
 
             public void imprimir(int position) {
                 list = categoria.getDatos();
-                tv1.setText(list.get(position).get("nombre").toString());
+                tv1.setText(list.get(position).getNombre());
 
             }
 
@@ -149,11 +136,10 @@ public class Pcategoria extends AppCompatActivity {
             private void onClickEliminar() {
                 int position = getLayoutPosition();
                 if (position != RecyclerView.NO_POSITION) {
-                    String id = list.get(getLayoutPosition()).get("id").toString();
+                    String id = list.get(getLayoutPosition()).getId();
                     categoria.delete(id);
                     listar();
-                    Toast.makeText(Pcategoria.this, "eliminado", Toast.LENGTH_SHORT).show();
-                }
+                                    }
             }
         }
     }
