@@ -1,15 +1,9 @@
 package arquitectura.trescapas.primerparcial.Presentacion;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.FragmentActivity;
-import androidx.fragment.app.FragmentContainer;
 
-import android.app.Fragment;
-import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
 
-import arquitectura.trescapas.primerparcial.Pcotizacion;
 import arquitectura.trescapas.primerparcial.R;
 import arquitectura.trescapas.primerparcial.fragments.MenuFragment;
 

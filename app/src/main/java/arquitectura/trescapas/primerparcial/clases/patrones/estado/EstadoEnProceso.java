@@ -1,19 +1,16 @@
-package arquitectura.trescapas.primerparcial.clases;
+package arquitectura.trescapas.primerparcial.clases.patrones.estado;
 
 import android.content.ContentValues;
 import android.content.Context;
 
-import java.lang.reflect.Array;
-import java.util.List;
-
 import arquitectura.trescapas.primerparcial.Datos.Dpedido;
 import arquitectura.trescapas.primerparcial.Utils.Utils;
-import arquitectura.trescapas.primerparcial.interfaces.Estado;
+import arquitectura.trescapas.primerparcial.clases.Pedido;
+import arquitectura.trescapas.primerparcial.clases.interfaces.Estado;
 
 public class EstadoEnProceso implements Estado {
     private Dpedido dPedido;
     private Context context;
-    private String[] estados = {"finalizado","cancelado"};
 
     public EstadoEnProceso(Dpedido dPedido) {
         this.context = dPedido.getContext();
@@ -29,17 +26,19 @@ public class EstadoEnProceso implements Estado {
     @Override
     public void finalizado() {
         Utils.mensaje(context,"pedido Finalizado");
-        this.dPedido.setEstado("finalizado");
+        this.dPedido.getPedido().setEstado("finalizado");
+        this.updatePrivate();
     }
 
     @Override
     public void cancelado() {
         Utils.mensaje(context,"pedido cancelado");
-        this.dPedido.setEstado("cancelado");
+        this.dPedido.getPedido().setEstado("cancelado");
+        this.updatePrivate();
     }
 
     @Override
-    public Boolean update(Dpedido data) {
+    public Boolean update(Pedido data) {
         try {
             ContentValues values = this.dPedido.getContentValues(data);
             String [] wereArgs = this.dPedido.getArguments(data);
@@ -53,6 +52,7 @@ public class EstadoEnProceso implements Estado {
 
         return false;
     }
+
 
     @Override
     public Boolean delete(String id) {
@@ -68,6 +68,18 @@ public class EstadoEnProceso implements Estado {
         return false;
     }
 
+    private void updatePrivate(){
+        try {
+            ContentValues values = this.dPedido.getContentValues(this.dPedido.getPedido());
+            String [] wereArgs = this.dPedido.getArguments(this.dPedido.getPedido());
+            this.dPedido.open();
+            int resultado = this.dPedido.getBasededatos().update(this.dPedido.getTabla(), values,"id = ?" , wereArgs);
+            this.dPedido.close();
 
+        }catch (Exception e) {
+            System.out.println("error al actualizar los datos" + e.getMessage());
+        }
+
+    }
 }
 

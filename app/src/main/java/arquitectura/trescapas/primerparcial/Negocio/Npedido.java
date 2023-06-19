@@ -6,9 +6,11 @@ import android.widget.Toast;
 import java.util.List;
 
 import arquitectura.trescapas.primerparcial.Datos.Dpedido;
+import arquitectura.trescapas.primerparcial.clases.Pedido;
+import arquitectura.trescapas.primerparcial.clases.interfaces.Negocio;
 
 
-public class Npedido {
+public class Npedido implements Negocio<Pedido> {
     private Dpedido dPedido;
     private Context context;
 
@@ -17,18 +19,15 @@ public class Npedido {
         this.context = context;
     }
 
-    public void cambiarEstado(String estado){
 
-    };
-
-    public void saveDatos(Dpedido data) {
+    public void saveDatos(Pedido data) {
         try {
-            if (data.getPedido().getClienteId().equals("") || data.getPedido().getRepartidorId().equals("")
-                    || data.getPedido().getFecha().equals("") || data.getPedido().getEstado().equals("")) {
+            if (data.getClienteId().equals("") || data.getRepartidorId().equals("")
+                    || data.getFecha().equals("") || data.getEstado().equals("")) {
                 throw new Exception("Debe Completar todos los campos");
             }
-
-            if (data.save(data)) {
+            Dpedido dPedido1 = new Dpedido(context,data);
+            if (dPedido1.save(data)) {
                 //this.dCliente.setData(data);
                 Toast.makeText(this.context, "Creado con exito", Toast.LENGTH_SHORT).show();
             }else {
@@ -40,14 +39,15 @@ public class Npedido {
         }
 
     }
-    public void updateDatos(Dpedido data ) {
+    public void updateDatos(Pedido data ) {
         try {
-            if (data.getPedido().getClienteId().equals("") || data.getPedido().getRepartidorId().equals("")
-                    || data.getPedido().getFecha().equals("") || data.getPedido().getEstado().equals("")) {
+            if (data.getClienteId().equals("") || data.getRepartidorId().equals("")
+                    || data.getFecha().equals("") || data.getEstado().equals("")) {
                 throw new Exception("Debe Completar todos los campos");
             }
-
-            if (data.update(data)){
+            Dpedido dPedido1 = new Dpedido(context,data);
+            dPedido1.setEstado(data.getEstado());
+            if (dPedido1.update(data)){
 
                 Toast.makeText(this.context, "actualizado con exito", Toast.LENGTH_SHORT).show();
             }else{
@@ -59,14 +59,16 @@ public class Npedido {
         }
     }
 
-    public List<Dpedido> getDatos() {
+    public List<Pedido> getDatos() {
         return this.dPedido.getAll();
     }
 
     public void delete(String id) {
         try {
-            Dpedido dpedido1 = getById(id);
-            if ( dpedido1.delete(id)){
+            Pedido pedido = getById(id);
+            Dpedido dPedido1 = new Dpedido(context,pedido);
+            dPedido1.setEstado(pedido.getEstado());
+            if ( dPedido1.delete(id)){
                 Toast.makeText(this.context, "pedido eliminado con exito", Toast.LENGTH_SHORT).show();
             }else{
                 throw new Exception("Ningun pedido fue eliminado");
@@ -77,7 +79,7 @@ public class Npedido {
 
     }
 
-    public Dpedido getById(String id) {
+    public Pedido getById(String id) {
         try {
             if (dPedido.getById(id) == null){
                 throw new Exception("pedido no encontrado");
@@ -90,14 +92,22 @@ public class Npedido {
         return null;
     }
 
-    public void finalizado() {
-        dPedido.finalizado();
+    public void finalizado(Pedido pedido) {
+        Dpedido dPedido1 = new Dpedido(context,pedido);
+        dPedido1.setEstado(pedido.getEstado());
+        dPedido1.finalizado();
     }
-    public void cancelado() {
-        dPedido.cancelado();
+    public void cancelado(Pedido pedido) {
+        Dpedido dPedido1 = new Dpedido(context,pedido);
+        dPedido1.setEstado(pedido.getEstado());
+        dPedido1.cancelado();
     }
-    public void enProceso() {
-        dPedido.enProceso();
+    public void enProceso(Pedido pedido) {
+        Dpedido dPedido1 = new Dpedido(context,pedido);
+        dPedido1.setEstado(pedido.getEstado());
+        dPedido1.enProceso();
     }
+
+
 
 }

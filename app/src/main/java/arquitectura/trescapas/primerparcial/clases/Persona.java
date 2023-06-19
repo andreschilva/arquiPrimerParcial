@@ -1,12 +1,14 @@
 package arquitectura.trescapas.primerparcial.clases;
 
-import arquitectura.trescapas.primerparcial.interfaces.Identificable;
+import arquitectura.trescapas.primerparcial.clases.interfaces.Identificable;
+import arquitectura.trescapas.primerparcial.clases.interfaces.Nombrable;
 
-public abstract class Persona implements Identificable {
+public abstract class Persona implements Identificable, Nombrable {
     private String id;
     private String nombre;
     private String apellido;
     private String celular;
+    private String foto;
 
     public Persona() {
     }
@@ -17,6 +19,7 @@ public abstract class Persona implements Identificable {
             this.nombre = persona.nombre;
             this.apellido = persona.apellido;
             this.celular = persona.celular;
+            this.foto = persona.foto;
         }
     }
 
@@ -50,6 +53,14 @@ public abstract class Persona implements Identificable {
 
     public void setCelular(String celular) {
         this.celular = celular;
+    }
+
+    public String getFoto() {
+        return foto;
+    }
+
+    public void setFoto(String foto) {
+        this.foto = foto;
     }
 
     public abstract Persona clone();

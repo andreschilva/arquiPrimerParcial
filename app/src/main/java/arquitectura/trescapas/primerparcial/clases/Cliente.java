@@ -15,13 +15,14 @@ public class Cliente extends Persona{
         }
     }
 
-    public static Cliente crear(String id, String nom, String ape, String cel, String ubi){
+    public static Cliente crear(String id, String nom, String ape, String cel, String ubi, String foto){
         Cliente cliente = new Cliente();
         cliente.setId(id);
         cliente.setNombre(nom);
         cliente.setApellido(ape);
         cliente.setCelular(cel);
         cliente.setUbicacion(ubi);
+        cliente.setFoto(foto);
         return cliente;
     };
 

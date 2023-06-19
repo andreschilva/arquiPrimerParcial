@@ -33,8 +33,8 @@
             style="@android:style/Widget.Material.Light.Spinner.Underlined"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="55dp"
-            android:layout_marginLeft="55dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginLeft="8dp"
             android:layout_marginTop="8dp"
             android:layout_marginEnd="8dp"
             android:layout_marginRight="8dp"
@@ -107,17 +107,6 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/spRepartidorPedido" />
 
-        <TextView
-            android:id="@+id/tvTotal2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:text="Total:"
-            android:textSize="24sp"
-            android:textStyle="bold"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/edFechaPedido" />
-
         <Button
             android:id="@+id/btnDetalles"
             android:layout_width="0dp"
@@ -142,25 +131,25 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:layout_marginLeft="16dp"
-            android:layout_marginTop="4dp"
+            android:layout_marginTop="8dp"
             android:layout_marginEnd="8dp"
             android:layout_marginRight="8dp"
             android:background="@drawable/eliminar2"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.987"
             app:layout_constraintStart_toEndOf="@+id/btnSave"
-            app:layout_constraintTop_toBottomOf="@+id/edTotalPedido" />
+            app:layout_constraintTop_toBottomOf="@+id/spCotizaciones" />
 
         <ImageButton
             android:id="@+id/btnSave"
             android:layout_width="47dp"
             android:layout_height="47dp"
-            android:layout_marginTop="4dp"
+            android:layout_marginTop="8dp"
             android:background="@android:color/transparent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.792"
+            app:layout_constraintHorizontal_bias="0.714"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/edTotalPedido"
+            app:layout_constraintTop_toBottomOf="@+id/spCotizaciones"
             app:srcCompat="@drawable/guardar" />
 
         <ImageButton
@@ -193,29 +182,39 @@
             app:layout_constraintStart_toEndOf="@+id/tvFecha2"
             app:layout_constraintTop_toBottomOf="@+id/spRepartidorPedido" />
 
-        <EditText
-            android:id="@+id/edTotalPedido"
+        <Spinner
+            android:id="@+id/spCotizaciones"
+            style="@android:style/Widget.Material.Light.Spinner.Underlined"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="75dp"
-            android:layout_marginLeft="75dp"
-            android:layout_marginTop="4dp"
-            android:ems="10"
-            android:inputType="numberDecimal"
+            android:layout_marginStart="16dp"
+            android:layout_marginLeft="16dp"
+            android:theme="?attr/ratingBarStyle"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toEndOf="@+id/tvTotal2"
-            app:layout_constraintTop_toBottomOf="@+id/edFechaPedido" />
+            app:layout_constraintStart_toEndOf="@+id/textView19"
+            app:layout_constraintTop_toBottomOf="@+id/edFechaPedido"
+            tools:targetApi="lollipop" />
 
         <Button
             android:id="@+id/btnCambiarEstado"
-            android:layout_width="93dp"
+            android:layout_width="91dp"
             android:layout_height="38dp"
             android:layout_marginTop="16dp"
             android:text="cambiar"
             android:textSize="10sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/textView19"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="Cotizacion:"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/edFechaPedido" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

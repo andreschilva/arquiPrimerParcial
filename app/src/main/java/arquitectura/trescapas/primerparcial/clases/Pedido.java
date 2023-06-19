@@ -1,6 +1,6 @@
 package arquitectura.trescapas.primerparcial.clases;
 
-import arquitectura.trescapas.primerparcial.interfaces.Identificable;
+import arquitectura.trescapas.primerparcial.clases.interfaces.Identificable;
 
 public class Pedido implements Identificable {
     private String id;
@@ -9,18 +9,20 @@ public class Pedido implements Identificable {
     private String estado;
     private String clienteId;
     private String repartidorId;
+    private String cotizacionId;
 
     public Pedido(){
 
     }
 
-    public Pedido(String id,String fecha, String total, String estadoId, String clienteId, String repartidorId) {
+    public Pedido(String id,String fecha, String total, String estadoId, String clienteId, String repartidorId,String cotizacionId) {
         this.id = id;
         this.fecha = fecha;
         this.total = total;
         this.estado = estadoId;
         this.clienteId = clienteId;
         this.repartidorId = repartidorId;
+        this.cotizacionId = cotizacionId;
     }
 
     public String getId() {
@@ -69,5 +71,13 @@ public class Pedido implements Identificable {
 
     public void setRepartidorId(String repartidorId) {
         this.repartidorId = repartidorId;
+    }
+
+    public String getCotizacionId() {
+        return cotizacionId;
+    }
+
+    public void setCotizacionId(String cotizacionId) {
+        this.cotizacionId = cotizacionId;
     }
 }

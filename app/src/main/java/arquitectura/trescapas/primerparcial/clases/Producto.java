@@ -2,7 +2,7 @@ package arquitectura.trescapas.primerparcial.clases;
 
 import androidx.annotation.Nullable;
 
-import arquitectura.trescapas.primerparcial.interfaces.Identificable;
+import arquitectura.trescapas.primerparcial.clases.interfaces.Identificable;
 
 public class Producto implements Identificable {
     private String id;

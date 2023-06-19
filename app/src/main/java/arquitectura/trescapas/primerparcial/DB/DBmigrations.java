@@ -9,6 +9,8 @@ public class DBmigrations {
     public static final String CLIENTE_APELLIDO = "apellido";
     public static final String CLIENTE_CELULAR = "celular";
     public static final String CLIENTE_UBICACION = "ubicacion";
+    public static final String CLIENTE_FOTO = "foto";
+
 
     public static final String TABLA_CLIENTE_CREATE =
             "create table " + TABLA_CLIENTE +
@@ -17,7 +19,8 @@ public class DBmigrations {
                     + CLIENTE_NOMBRE + " text not null, "
                     + CLIENTE_APELLIDO + " text not null, "
                     + CLIENTE_CELULAR + " text not null, "
-                    + CLIENTE_UBICACION + " text not null)";
+                    + CLIENTE_UBICACION + " text not null, "
+                    + CLIENTE_FOTO + " text not null)";
 
 
     //TABLA REPARTIDOR
@@ -27,6 +30,7 @@ public class DBmigrations {
     public static final String REPARTIDOR_APELLIDO = "apellido";
     public static final String REPARTIDOR_CELULAR = "celular";
     public static final String REPARTIDOR_PLACA = "placa";
+    public static final String REPARTIDOR_FOTO = "foto";
 
     public static final String TABLA_REPARTIDOR_CREATE =
             "create table " + TABLA_REPARTIDOR +
@@ -35,7 +39,8 @@ public class DBmigrations {
                     + REPARTIDOR_NOMBRE + " text not null, "
                     + REPARTIDOR_APELLIDO + " text not null, "
                     + REPARTIDOR_CELULAR + " text not null, "
-                    + REPARTIDOR_PLACA + " text not null)";
+                    + REPARTIDOR_PLACA + " text not null, "
+                    + REPARTIDOR_FOTO + " text not null)";
 
     //TABLA CATEGORIA
     public static final String TABLA_CATEGORIA = "categorias";
@@ -78,9 +83,45 @@ public class DBmigrations {
     public static final String PEDIDO_FECHA = "fecha";
     public static final String PEDIDO_CLIENTE_ID = "cliente_id";
     public static final String PEDIDO_REPARTIDOR_ID = "repartidor_id";
+    public static final String PEDIDO_COTIZACION_ID = "cotizacion_id";
 
 
 
+
+
+
+
+    //TABLA COTIZACION
+    public static final String TABLA_COTIZACION = "cotizaciones";
+    public static final String COTIZACION_ID = "id";
+    public static final String COTIZACION_NOMBRE = "pedido_id";
+    public static final String COTIZACION_FECHA = "fecha";
+    public static final String COTIZACION_TOTAL = "total";
+
+    public static final String TABLA_COTIZACION_CREATE =
+            "create table " + TABLA_COTIZACION +
+                    "("
+                    + COTIZACION_ID+ " integer not null primary key autoincrement, "
+                    + COTIZACION_NOMBRE + " text not null, "
+                    +  COTIZACION_FECHA + " text not null, "
+                    + COTIZACION_TOTAL + " float)";
+
+    //TABLA DETALLE_COTIZACION
+    public static final String TABLA_DETALLE_COTIZACION = "detalle_cotizacion";
+    public static final String DETALLE_COTIZACION_ID = "id";
+    public static final String DETALLE_COTIZACION_COTIZACION_ID = "cotizacion_id";
+    public static final String DETALLE_COTIZACION_PRODUCTO_ID = "producto_id";
+    public static final String DETALLE_COTIZACION_CANTIDAD = "cantidad";
+
+    public static final String TABLA_DETALLE_COTIZACION_CREATE =
+            "create table " + TABLA_DETALLE_COTIZACION +
+                    "("
+                    + DETALLE_COTIZACION_ID+ " integer not null primary key autoincrement, "
+                    + DETALLE_COTIZACION_COTIZACION_ID + " integer not null, "
+                    + DETALLE_COTIZACION_PRODUCTO_ID + " integer not null, "
+                    + DETALLE_COTIZACION_CANTIDAD + " integer not null, "
+                    +"foreign key ("+DETALLE_COTIZACION_COTIZACION_ID+") references "+TABLA_COTIZACION+"(id), "
+                    + "foreign key ("+DETALLE_COTIZACION_PRODUCTO_ID+") references "+TABLA_PRODUCTO+"(id) )";
 
     public static final String TABLA_PEDIDO_CREATE =
             "create table " + TABLA_PEDIDO +
@@ -91,25 +132,17 @@ public class DBmigrations {
                     + PEDIDO_FECHA + " date not null, "
                     + PEDIDO_CLIENTE_ID + " integer not null, "
                     + PEDIDO_REPARTIDOR_ID + " integer not null, "
+                    + PEDIDO_COTIZACION_ID + " integer not null, "
                     +"foreign key ("+PEDIDO_CLIENTE_ID+") references "+TABLA_CLIENTE+"(id), "
-                    +"foreign key ("+PEDIDO_REPARTIDOR_ID+") references "+TABLA_REPARTIDOR+"(id) )";
-
-    //TABLA DETALLE_PEDIDO
-    public static final String TABLA_DETALLE_PEDIDO = "detalle_pedidos";
-    public static final String DETALLE_PEDIDO_ID = "id";
-    public static final String DETALLE_PEDIDO_PEDIDO_ID = "pedido_id";
-    public static final String DETALLE_PEDIDO_PRODUCTO_ID = "producto_id";
-    public static final String DETALLE_PEDIDO_CANTIDAD = "cantidad";
+                    +"foreign key ("+PEDIDO_REPARTIDOR_ID+") references "+TABLA_REPARTIDOR+"(id), "
+                    +"foreign key ("+PEDIDO_COTIZACION_ID+") references "+TABLA_COTIZACION+"(id) )";
 
 
-    public static final String TABLA_DETALLE_PEDIDO_CREATE =
-            "create table " + TABLA_DETALLE_PEDIDO +
-                    "("
-                    + DETALLE_PEDIDO_ID+ " integer not null primary key autoincrement, "
-                    + DETALLE_PEDIDO_PEDIDO_ID + " integer not null, "
-                    + DETALLE_PEDIDO_PRODUCTO_ID + " integer not null, "
-                    + DETALLE_PEDIDO_CANTIDAD + " text not null, "
-                    +"foreign key ("+DETALLE_PEDIDO_PEDIDO_ID+") references "+TABLA_PEDIDO+"(id) "
-                    + "foreign key ("+DETALLE_PEDIDO_PRODUCTO_ID+") references "+TABLA_PRODUCTO+"(id) )";
-    }
+}
+
+
+
+
+
+
 

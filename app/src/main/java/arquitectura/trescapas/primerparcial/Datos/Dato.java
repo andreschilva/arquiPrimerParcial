@@ -1,4 +1,4 @@
-package arquitectura.trescapas.primerparcial.DB;
+package arquitectura.trescapas.primerparcial.Datos;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -9,7 +9,8 @@ import android.database.sqlite.SQLiteDatabase;
 import java.util.ArrayList;
 import java.util.List;
 
-import arquitectura.trescapas.primerparcial.interfaces.Identificable;
+import arquitectura.trescapas.primerparcial.DB.DBconexion;
+import arquitectura.trescapas.primerparcial.clases.interfaces.Identificable;
 
 public abstract class Dato<T extends Identificable>  {
     private DBconexion conexion;

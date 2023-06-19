@@ -105,6 +105,7 @@
             android:inputType="numberDecimal"
             android:text="1"
             android:textSize="12sp"
+            android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/textView18"
             app:layout_constraintHorizontal_bias="1.0"

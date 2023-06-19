@@ -9,15 +9,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 import arquitectura.trescapas.primerparcial.DB.DBmigrations;
-import arquitectura.trescapas.primerparcial.DB.Dato;
-import arquitectura.trescapas.primerparcial.clases.EstadoCancelado;
-import arquitectura.trescapas.primerparcial.clases.EstadoEnProceso;
-import arquitectura.trescapas.primerparcial.interfaces.Estado;
-import arquitectura.trescapas.primerparcial.clases.EstadoFinalizado;
-import arquitectura.trescapas.primerparcial.interfaces.Identificable;
+import arquitectura.trescapas.primerparcial.clases.patrones.estado.EstadoCancelado;
+import arquitectura.trescapas.primerparcial.clases.patrones.estado.EstadoEnProceso;
+import arquitectura.trescapas.primerparcial.clases.interfaces.Estado;
+import arquitectura.trescapas.primerparcial.clases.patrones.estado.EstadoFinalizado;
 import arquitectura.trescapas.primerparcial.clases.Pedido;
 
-public class Dpedido extends Dato<Dpedido> implements Identificable {
+public class Dpedido extends Dato<Pedido>  {
     Map<String,Estado> estados;
     Estado estadoActual;
     Context context;
@@ -45,7 +43,6 @@ public class Dpedido extends Dato<Dpedido> implements Identificable {
         estados.put("En proceso",new EstadoEnProceso(this));
         estados.put("finalizado",new EstadoFinalizado(this));
         estados.put("cancelado",new EstadoCancelado(this));
-
     }
 
     public void setEstado(String estado){
@@ -54,7 +51,7 @@ public class Dpedido extends Dato<Dpedido> implements Identificable {
     }
 
     @Override
-    public boolean update(Dpedido data) {
+    public boolean update(Pedido data) {
         return this.estadoActual.update(data);
     }
 
@@ -77,47 +74,33 @@ public class Dpedido extends Dato<Dpedido> implements Identificable {
 
 
     @Override
-    public ContentValues getContentValues(Dpedido data) {
+    public ContentValues getContentValues(Pedido data) {
        ContentValues values = new ContentValues();
 
-       if (data.pedido.getId() != "") {
-           values.put(DBmigrations.PEDIDO_ID, data.pedido.getId());
+       if (data.getId() != "") {
+           values.put(DBmigrations.PEDIDO_ID, data.getId());
        }
-       values.put(DBmigrations.PEDIDO_ESTADO, data.pedido.getEstado());
-       values.put(DBmigrations.PEDIDO_TOTAL, data.pedido.getTotal());
-       values.put(DBmigrations.PEDIDO_FECHA, data.pedido.getFecha());
-       values.put(DBmigrations.PEDIDO_CLIENTE_ID, data.pedido.getClienteId());
-       values.put(DBmigrations.PEDIDO_REPARTIDOR_ID, data.pedido.getRepartidorId());
-       return values;
+       values.put(DBmigrations.PEDIDO_ESTADO, data.getEstado());
+       values.put(DBmigrations.PEDIDO_TOTAL, data.getTotal());
+       values.put(DBmigrations.PEDIDO_FECHA, data.getFecha());
+       values.put(DBmigrations.PEDIDO_CLIENTE_ID, data.getClienteId());
+       values.put(DBmigrations.PEDIDO_REPARTIDOR_ID, data.getRepartidorId());
+       values.put(DBmigrations.PEDIDO_COTIZACION_ID, data.getCotizacionId());
+
+        return values;
     }
 
     @Override
-    protected Dpedido getdata(Cursor cursor) {
-        Dpedido dpedido = new Dpedido(context);
-        dpedido.pedido.setId(cursor.getString(cursor.getColumnIndexOrThrow(DBmigrations.PEDIDO_ID)));
-        dpedido.pedido.setEstado(cursor.getString(cursor.getColumnIndexOrThrow(DBmigrations.PEDIDO_ESTADO)));
-        dpedido.pedido.setTotal(cursor.getString(cursor.getColumnIndexOrThrow(DBmigrations.PEDIDO_TOTAL)));
-        dpedido.pedido.setFecha(cursor.getString(cursor.getColumnIndexOrThrow(DBmigrations.PEDIDO_FECHA)));
-        dpedido.pedido.setClienteId(cursor.getString(cursor.getColumnIndexOrThrow(DBmigrations.PEDIDO_CLIENTE_ID)));
-        dpedido.pedido.setRepartidorId(cursor.getString(cursor.getColumnIndexOrThrow(DBmigrations.PEDIDO_REPARTIDOR_ID)));
-        dpedido.setEstado(dpedido.pedido.getEstado());
-        return dpedido;
-    }
-
-    @Override
-    public String[] getArguments(Dpedido data) {
-        return new String[]{data.getPedido().getId().toString()};
-    }
-
-
-    @Override
-    public String getId() {
-        return this.pedido.getId();
-    }
-
-    @Override
-    public void setId(String id) {
-        this.pedido.setId(id);
+    protected Pedido getdata(Cursor cursor) {
+        Pedido pedido = new Pedido();
+        pedido.setId(cursor.getString(cursor.getColumnIndexOrThrow(DBmigrations.PEDIDO_ID)));
+        pedido.setEstado(cursor.getString(cursor.getColumnIndexOrThrow(DBmigrations.PEDIDO_ESTADO)));
+        pedido.setTotal(cursor.getString(cursor.getColumnIndexOrThrow(DBmigrations.PEDIDO_TOTAL)));
+        pedido.setFecha(cursor.getString(cursor.getColumnIndexOrThrow(DBmigrations.PEDIDO_FECHA)));
+        pedido.setClienteId(cursor.getString(cursor.getColumnIndexOrThrow(DBmigrations.PEDIDO_CLIENTE_ID)));
+        pedido.setRepartidorId(cursor.getString(cursor.getColumnIndexOrThrow(DBmigrations.PEDIDO_REPARTIDOR_ID)));
+        pedido.setCotizacionId(cursor.getString(cursor.getColumnIndexOrThrow(DBmigrations.PEDIDO_COTIZACION_ID)));
+        return pedido;
     }
 
     public Context getContext() {
@@ -142,6 +125,10 @@ public class Dpedido extends Dato<Dpedido> implements Identificable {
 
     public SQLiteDatabase getBasededatos() {
         return super.basededatos;
+    }
+
+    public String [] getArguments(Pedido pedido) {
+        return super.getArguments(pedido);
     }
 
 }

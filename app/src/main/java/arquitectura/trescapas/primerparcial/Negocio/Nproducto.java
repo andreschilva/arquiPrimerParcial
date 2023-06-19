@@ -7,9 +7,10 @@ import java.util.List;
 
 import arquitectura.trescapas.primerparcial.Datos.Dproducto;
 import arquitectura.trescapas.primerparcial.clases.Producto;
+import arquitectura.trescapas.primerparcial.clases.interfaces.Negocio;
 
 
-public class Nproducto {
+public class Nproducto implements Negocio<Producto> {
     private Dproducto dproducto;
     private Context context;
 

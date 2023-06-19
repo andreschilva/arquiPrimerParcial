@@ -56,8 +56,6 @@ public class Pproduto extends AppCompatActivity{
     Ncategoria categoria;
     List<Producto> listProductos;
     List<Categoria> lisCategorias;
-    List<Map<String,Object>> lisProductoCategoria;
-    List<Producto> listProductosSeleccionados;
     Bitmap bitmap;
 
     String nombreFoto;
@@ -66,13 +64,11 @@ public class Pproduto extends AppCompatActivity{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_pproduto);
 
-        tvNumero = findViewById(R.id.tvnumero1);
 
         producto = new Nproducto(this);
         categoria = new Ncategoria(this);
         listProductos = producto.getDatos();
         lisCategorias = categoria.getDatos();
-        listProductosSeleccionados = new ArrayList<>();
 
         rv1 = findViewById(R.id.rv1);
 
@@ -124,8 +120,8 @@ public class Pproduto extends AppCompatActivity{
                     long positionCategoria= spCategoria.getSelectedItemPosition();
                     Categoria categoriaSeleccionada = lisCategorias.get((int) positionCategoria);
 
-                    nombreFoto = crearNombreArchivoJPG();
-                    guardarFoto();
+                    nombreFoto = Utils.crearNombreArchivoJPG();
+                    Utils.guardarFoto(bitmap,Pproduto.this,nombreFoto);
 
                     Producto data = new Producto("",nombre,descripcion,precio,nombreFoto,categoriaSeleccionada.getId());
                     producto.saveDatos(data);
@@ -167,11 +163,7 @@ public class Pproduto extends AppCompatActivity{
 
         return new ArrayAdapter<>(this, android.R.layout.simple_spinner_item,arrayCategorias);
     }
-    protected void guardarFoto() throws IOException {
-        FileOutputStream fos = openFileOutput(nombreFoto, Context.MODE_PRIVATE);
-        bitmap.compress(Bitmap.CompressFormat.JPEG,100,fos);
-        fos.close();
-    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data)  {
         super.onActivityResult(requestCode, resultCode, data);
@@ -211,47 +203,49 @@ public class Pproduto extends AppCompatActivity{
 //        }
     }
 
-    private String crearNombreArchivoJPG() {
-        String fecha = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-        return fecha+".jpg";
-    }
+
 
    public void listar() {
         this.listProductos = producto.getDatos();
         aP.notifyDataSetChanged();
     }
 
-    public void enviarCotizacion(View v) {
-        String numero = tvNumero.getText().toString();
-
-        StringBuilder mensaje = new StringBuilder();
-        mensaje.append("Lista de productos:\n");
-
-        double total = 0.0;
-        for (Producto producto : this.listProductosSeleccionados) {
-            String nombre =  producto.getNombre();
-            double precio =Double.parseDouble( producto.getPrecio());
-            int cantidad = 1;
-
-            mensaje.append("Nombre: ").append(nombre).append("\n");
-            mensaje.append("Precio: ").append(precio).append("\n");
-            mensaje.append("Cantidad: ").append(cantidad).append("\n");
-            mensaje.append("-----------------\n");
-
-            total += precio*cantidad;
-        }
-        mensaje.append("Total: ").append(total).append("\n");
-
-        //Toast.makeText(this,  mensaje, Toast.LENGTH_SHORT).show();
-
-        //boolean installed = appInstalledOrNot("com.whatsapp");
-        //if (installed) {
-        Intent intent = new Intent(Intent.ACTION_VIEW);
-        intent.setData(Uri.parse("http://api.whatsapp.com/send?phone="+"+591"+numero+ "&text="+mensaje));
-        startActivity(intent);
-//        }else {
-//            Toast.makeText(this, "Whasapp no esta instalado en tu dispositivo", Toast.LENGTH_SHORT).show();
+//    public void enviarCotizacion(View v) {
+//        String numero = tvNumero.getText().toString();
+//
+//        StringBuilder mensaje = new StringBuilder();
+//        mensaje.append("Lista de productos:\n");
+//
+//        double total = 0.0;
+//        for (Producto producto : this.listProductosSeleccionados) {
+//            String nombre =  producto.getNombre();
+//            double precio =Double.parseDouble( producto.getPrecio());
+//            int cantidad = 1;
+//
+//            mensaje.append("Nombre: ").append(nombre).append("\n");
+//            mensaje.append("Precio: ").append(precio).append("\n");
+//            mensaje.append("Cantidad: ").append(cantidad).append("\n");
+//            mensaje.append("-----------------\n");
+//
+//            total += precio*cantidad;
 //        }
+//        mensaje.append("Total: ").append(total).append("\n");
+//
+//        //Toast.makeText(this,  mensaje, Toast.LENGTH_SHORT).show();
+//
+//        //boolean installed = appInstalledOrNot("com.whatsapp");
+//        //if (installed) {
+//        Intent intent = new Intent(Intent.ACTION_VIEW);
+//        intent.setData(Uri.parse("http://api.whatsapp.com/send?phone="+"+591"+numero+ "&text="+mensaje));
+//        startActivity(intent);
+////        }else {
+////            Toast.makeText(this, "Whasapp no esta instalado en tu dispositivo", Toast.LENGTH_SHORT).show();
+////        }
+//    }
+
+    public void cotizaciones(View v) {
+        Intent intento = new Intent(this, Pcotizacion.class);
+        startActivity(intento);
     }
 
     private class AdaptadorProducto extends RecyclerView.Adapter<AdaptadorProducto.AdaptadorProductoHolder> {
@@ -284,11 +278,9 @@ public class Pproduto extends AppCompatActivity{
                 edDescripcion = itemView.findViewById(R.id.edDescripcionP);
                 edPrecio = itemView.findViewById(R.id.edPrecioP);
                 edCategoria = itemView.findViewById(R.id.edCategoriaP);
-                edCantidad = itemView.findViewById(R.id.edCantidad);
-                checkBox = itemView.findViewById(R.id.cBProductos);
                 btnEliminar =  itemView.findViewById(R.id.btnEliminar);
                 btnEditar =  itemView.findViewById(R.id.btnEdit);
-                ivFoto = itemView.findViewById(R.id.iv1);
+                ivFoto = itemView.findViewById(R.id.btnFotoUsuario);
 
                 ArrayAdapter<String> adapterCategorias = new ArrayAdapter<String>(Pproduto.this, android.R.layout.simple_spinner_item,categoria.getNombresCategorias());
                 edCategoria.setAdapter(adapterCategorias);
@@ -306,12 +298,6 @@ public class Pproduto extends AppCompatActivity{
                         editar();
                     }
                 });
-                checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-                    @Override
-                    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                        onCheckedCotizacion();
-                    }
-                });
 
                 ivFoto.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -327,7 +313,8 @@ public class Pproduto extends AppCompatActivity{
                 Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
                 // intent.setType("image/");
                 startActivityForResult(intent.createChooser(intent,"Seleccione la Aplicacion"),1);
-                nombreFoto = crearNombreArchivoJPG();
+                nombreFoto = Utils.crearNombreArchivoJPG();
+
             }
 
 
@@ -403,7 +390,8 @@ public class Pproduto extends AppCompatActivity{
                                 file.delete();
 
                                 productoActual.setFoto(nombreFoto);
-                                guardarFoto();
+                                Utils.guardarFoto(bitmap,Pproduto.this,nombreFoto);
+
                             }catch (Exception e){
                                 Utils.mensaje(Pproduto.this,e.getMessage());
                             }
@@ -457,17 +445,6 @@ public class Pproduto extends AppCompatActivity{
 
                 builder.create().show();
 
-            }
-
-            private void onCheckedCotizacion() {
-                if (checkBox.isChecked()) {
-                    Producto productoActual = listProductos.get(getLayoutPosition());
-                    //productoActual.put("cantidad", edCantidad.getText());
-                    listProductosSeleccionados.add(productoActual);
-                }
-                else {
-                    listProductosSeleccionados.remove(listProductos.get(getLayoutPosition()));
-                }
             }
         }
     }

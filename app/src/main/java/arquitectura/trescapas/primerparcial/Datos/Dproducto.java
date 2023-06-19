@@ -4,21 +4,14 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import arquitectura.trescapas.primerparcial.DB.DBmanager1;
 import arquitectura.trescapas.primerparcial.DB.DBmigrations;
-import arquitectura.trescapas.primerparcial.DB.Dato;
-import arquitectura.trescapas.primerparcial.Utils.IDatos1;
-import arquitectura.trescapas.primerparcial.clases.Cliente;
 import arquitectura.trescapas.primerparcial.clases.Producto;
 
 public class Dproducto extends Dato<Producto> {
-
+Producto producto;
     public Dproducto(Context constext) {
         super(constext);
+        this.producto = new Producto();
         super.tabla = DBmigrations.TABLA_PRODUCTO;
     }
 

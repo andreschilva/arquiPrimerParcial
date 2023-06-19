@@ -14,8 +14,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Estado"
-        android:textColor="#5E35B1"
-        android:textSize="24sp" />
+        android:textSize="24sp"
+        android:textStyle="bold" />
 
     <Spinner
         android:id="@+id/spEstado"
@@ -32,8 +32,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Cliente"
-        android:textColor="#5E35B1"
-        android:textSize="24sp" />
+        android:textSize="24sp"
+        android:textStyle="bold" />
 
     <Spinner
         android:id="@+id/spCliente"
@@ -49,14 +49,30 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Repartidor"
-        android:textColor="#5E35B1"
-        android:textSize="24sp" />
+        android:textSize="24sp"
+        android:textStyle="bold" />
 
     <Spinner
         android:id="@+id/spRepartidor"
         style="@android:style/Widget.Material.Light.Spinner.Underlined"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:theme="?attr/ratingBarStyle"
+        tools:targetApi="lollipop" />
+
+    <TextView
+        android:id="@+id/textView20"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Cotizacion"
+        android:textSize="24sp"
+        android:textStyle="bold" />
+
+    <Spinner
+        android:id="@+id/spCotizacionCrearP"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        style="@android:style/Widget.Material.Light.Spinner.Underlined"
         android:theme="?attr/ratingBarStyle"
         tools:targetApi="lollipop" />
 
@@ -83,13 +99,5 @@
             app:srcCompat="@drawable/ic_baseline_calendar_month_24" />
 
     </LinearLayout>
-
-    <EditText
-        android:id="@+id/edTotal"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:ems="10"
-        android:hint="Total"
-        android:inputType="numberDecimal" />
 
 </LinearLayout>

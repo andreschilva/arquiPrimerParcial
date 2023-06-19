@@ -7,9 +7,10 @@ import java.util.List;
 
 import arquitectura.trescapas.primerparcial.Datos.Dcliente;
 import arquitectura.trescapas.primerparcial.clases.Cliente;
+import arquitectura.trescapas.primerparcial.clases.interfaces.Negocio;
 
 
-public class Ncliente {
+public class Ncliente implements Negocio<Cliente> {
     private Dcliente dCliente;
     Context context;
 
@@ -52,6 +53,7 @@ public class Ncliente {
             Toast.makeText(this.context, e.getMessage(), Toast.LENGTH_SHORT).show();
         }
     }
+
 
     public List<Cliente> getDatos() {
         return this.dCliente.getAll();

@@ -20,17 +20,18 @@ import android.widget.ImageButton;
 import android.widget.Spinner;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.List;
 
-import arquitectura.trescapas.primerparcial.Datos.Dpedido;
 import arquitectura.trescapas.primerparcial.Negocio.Ncliente;
+import arquitectura.trescapas.primerparcial.Negocio.Ncotizacion;
 import arquitectura.trescapas.primerparcial.Negocio.Npedido;
 import arquitectura.trescapas.primerparcial.Negocio.Nproducto;
 import arquitectura.trescapas.primerparcial.Negocio.Nrepartidor;
 import arquitectura.trescapas.primerparcial.PdetallePedido;
+import arquitectura.trescapas.primerparcial.Presentacion.adaptadores.SpinnerAdapter;
 import arquitectura.trescapas.primerparcial.R;
 import arquitectura.trescapas.primerparcial.clases.Cliente;
+import arquitectura.trescapas.primerparcial.clases.Cotizacion;
 import arquitectura.trescapas.primerparcial.clases.Pedido;
 import arquitectura.trescapas.primerparcial.clases.Producto;
 import arquitectura.trescapas.primerparcial.clases.Repartidor;
@@ -44,20 +45,15 @@ public class Ppedido extends AppCompatActivity {
     Npedido pedido;
     Ncliente cliente;
     Nrepartidor repartidor;
+    Ncotizacion cotizacion;
 
     //listas
     List<Producto> listProductos;
-    List<Dpedido> listPedidos;
+    List<Pedido> listPedidos;
     List<Cliente> listClientes;
     List<Repartidor> listRepartidores;
-    List<Pproduto> listProductosSeleccionados;
+    List<Cotizacion> listCotizaciones;
     String [] arrayEstados = {"En proceso","finalizado","cancelado"};
-    List<String> listEstados = new ArrayList<>();
-
-
-
-
-    int pos;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,14 +65,14 @@ public class Ppedido extends AppCompatActivity {
         cliente = new Ncliente(this);
         repartidor = new Nrepartidor(this);
         pedido = new Npedido(this);
+        cotizacion = new Ncotizacion(this);
 
         //cargando listas
         listProductos = producto.getDatos();
         listClientes= cliente.getDatos();
         listRepartidores = repartidor.getDatos();
         listPedidos = pedido.getDatos();
-        listProductosSeleccionados = new ArrayList<>();
-        listEstados.add("En proceso");
+        listCotizaciones = cotizacion.getDatos();
 
 
         rv1 = findViewById(R.id.rv1);
@@ -93,11 +89,11 @@ public class Ppedido extends AppCompatActivity {
         View selector = getLayoutInflater().inflate(R.layout.modalcrearpedido,null);
         builder.setView(selector);
 
-        Spinner sp1 = selector.findViewById(R.id.spEstado);
-        Spinner sp2 = selector.findViewById(R.id.spCliente);
-        Spinner sp3 = selector.findViewById(R.id.spRepartidor);
+        Spinner spEstado = selector.findViewById(R.id.spEstado);
+        Spinner spCliente = selector.findViewById(R.id.spCliente);
+        Spinner spRepartidor = selector.findViewById(R.id.spRepartidor);
+        Spinner spCotizacion= selector.findViewById(R.id.spCotizacionCrearP);
         EditText ed1Fecha = selector.findViewById(R.id.edFecha);
-        EditText ed2Total = selector.findViewById(R.id.edTotal);
         ImageButton btnCalendario = selector.findViewById(R.id.btnCalendario);
 
         btnCalendario.setOnClickListener(new View.OnClickListener() {
@@ -113,37 +109,34 @@ public class Ppedido extends AppCompatActivity {
             }
         });
 
-        ArrayAdapter<String> adapterClientes = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item,cliente.getNombresClientes());
-        ArrayAdapter<String> adapterRepartidores = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item,repartidor.getNombresRepartidores());
-        ArrayAdapter<String> adapterEstados = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item,arrayEstados);
+        SpinnerAdapter adapterClientes = new SpinnerAdapter(this, listClientes);
+        spCliente.setAdapter(adapterClientes);
 
-        sp1.setAdapter(adapterEstados);
-        sp2.setAdapter(adapterClientes);
-        sp3.setAdapter(adapterRepartidores);
+        SpinnerAdapter adapterRepartidores = new SpinnerAdapter(this, listRepartidores);
+        spRepartidor.setAdapter(adapterRepartidores);
+
+        SpinnerAdapter adapterCotizaciones = new SpinnerAdapter(this, listCotizaciones);
+        spCotizacion.setAdapter(adapterCotizaciones);
+
+        ArrayAdapter<String> adapterEstados = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item,arrayEstados);
+        spEstado.setAdapter(adapterEstados);
+
 
         builder.setPositiveButton("crear", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                long positionEstado= sp1.getSelectedItemPosition();
-                long positionCliente= sp2.getSelectedItemPosition();
-                long positionRepartidor= sp3.getSelectedItemPosition();
+                long positionEstado= spEstado.getSelectedItemPosition();
 
-                Cliente clienteSeleccionado = listClientes.get((int) positionCliente);
-                Repartidor repartidorSeleccionado = listRepartidores.get((int) positionRepartidor);
+                Cliente clienteSeleccionado = (Cliente) spCliente.getSelectedItem();
+                Repartidor repartidorSeleccionado = (Repartidor) spRepartidor.getSelectedItem();
+                Cotizacion cotizacionSeleccionada = (Cotizacion) spCotizacion.getSelectedItem();
                 String estadoSeleccionado = arrayEstados[(int) positionEstado];
                 String fecha = ed1Fecha.getText().toString();
-                String total = ed2Total.getText().toString();
 
 
-                //Toast.makeText(this,  listClientes.get((int) position).get("nombre").toString(), Toast.LENGTH_SHORT).show();
-                Pedido data = new Pedido();
-                data.setEstado(estadoSeleccionado);
-                data.setFecha(fecha);
-                data.setTotal(total);
-                data.setClienteId(clienteSeleccionado.getId());
-                data.setRepartidorId(repartidorSeleccionado.getId());
-                Dpedido dPedido = new Dpedido(Ppedido.this,data);
-                pedido.saveDatos(dPedido);
+                Pedido data = new Pedido("",fecha,"",estadoSeleccionado,clienteSeleccionado.getId(),
+                        repartidorSeleccionado.getId(),cotizacionSeleccionada.getId());
+                pedido.saveDatos(data);
                     listar();
                     rv1.scrollToPosition(listPedidos.size()-1);
             }
@@ -190,7 +183,7 @@ public class Ppedido extends AppCompatActivity {
 
         public class AdaptadorPedidoHolder extends RecyclerView.ViewHolder  {
 
-            Spinner spEstado, spCliente, spRepartidor;
+            Spinner spEstado, spCliente, spRepartidor, spCotizcion;
             EditText edFecha, edTotal;
             Button  btnDetalles, btnCambiarEstado;
             ImageButton btnEliminar, btnEdit,btnFecha;
@@ -199,8 +192,8 @@ public class Ppedido extends AppCompatActivity {
                 spEstado = itemView.findViewById(R.id.spEstadoPedido);
                 spCliente = itemView.findViewById(R.id.spClientePedido);
                 spRepartidor = itemView.findViewById(R.id.spRepartidorPedido);
+                spCotizcion = itemView.findViewById(R.id.spCotizaciones);
                 edFecha = itemView.findViewById(R.id.edFechaPedido);
-                edTotal = itemView.findViewById(R.id.edTotalPedido);
                 btnEliminar =  itemView.findViewById(R.id.btnEliminar);
                 btnEdit = itemView.findViewById(R.id.btnSave);
                 btnDetalles = itemView.findViewById(R.id.btnDetalles);
@@ -216,11 +209,14 @@ public class Ppedido extends AppCompatActivity {
                 ArrayAdapter<String> adapterEstados = new ArrayAdapter<String>(Ppedido.this, android.R.layout.simple_spinner_item,arrayEstados);
                 spEstado.setAdapter(adapterEstados);
 
-                ArrayAdapter<String> adapterClientes = new ArrayAdapter<String>(Ppedido.this, android.R.layout.simple_spinner_item,cliente.getNombresClientes());
+                SpinnerAdapter adapterClientes = new SpinnerAdapter(Ppedido.this, listClientes);
                 spCliente.setAdapter(adapterClientes);
 
-                ArrayAdapter<String> adapterRepartidores = new ArrayAdapter<String>(Ppedido.this, android.R.layout.simple_spinner_item,repartidor.getNombresRepartidores());
+                SpinnerAdapter adapterRepartidores = new SpinnerAdapter(Ppedido.this, listRepartidores);
                 spRepartidor.setAdapter(adapterRepartidores);
+
+                SpinnerAdapter adapterCotizaciones = new SpinnerAdapter(Ppedido.this, listCotizaciones);
+                spCotizcion.setAdapter(adapterCotizaciones);
             }
 
             public void eventos() {
@@ -241,7 +237,7 @@ public class Ppedido extends AppCompatActivity {
                 btnDetalles.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        onClickDetalles();
+                        detalles();
                     }
                 });
 
@@ -271,45 +267,49 @@ public class Ppedido extends AppCompatActivity {
 
             private void cambiarEstado() {
                 int position = getLayoutPosition();
-                Dpedido pedidoActual = listPedidos.get(position);
+                Pedido pedidoActual = listPedidos.get(position);
 
                 long positionEstado = spEstado.getSelectedItemPosition();
                 String estadoSeleccionado = arrayEstados[(int) positionEstado];
 
                 if (estadoSeleccionado.equals("En proceso")){
-                   pedidoActual.enProceso();
+                   pedido.enProceso(pedidoActual);
                 }else if(estadoSeleccionado.equals("finalizado")){
-                    pedidoActual.finalizado();
+                    pedido.finalizado(pedidoActual);
                 }else{
-                    pedidoActual.cancelado();
+                    pedido.cancelado(pedidoActual);
                 }
             }
 
 
             public void imprimir(int position) {
                 //listPedidos = pedido.getDatos();
-                Dpedido pedidoActual = listPedidos.get(position);
+                Pedido pedidoActual = listPedidos.get(position);
 
-                if (pedidoActual.getPedido().getEstado().equals("En proceso")){
+                if (pedidoActual.getEstado().equals("En proceso")){
                     spEstado.setSelection(0);
-                }else if(pedidoActual.getPedido().getEstado().equals("finalizado")){
+                }else if(pedidoActual.getEstado().equals("finalizado")){
                     spEstado.setSelection(1);
                 }else{
                     spEstado.setSelection(2);
                 }
 
-                String idcliente = pedidoActual.getPedido().getClienteId();
+                String idcliente = pedidoActual.getClienteId();
                 Cliente clienteActual= cliente.getById(idcliente);
                 int posCliente = listClientes.indexOf(clienteActual);
                 spCliente.setSelection(posCliente);
 
-                String idRepartidor =pedidoActual.getPedido().getRepartidorId();
+                String idRepartidor =pedidoActual.getRepartidorId();
                 Repartidor repartidorActual= repartidor.getById(idRepartidor);
                 int posRepartidor = listRepartidores.indexOf(repartidorActual);
                 spRepartidor.setSelection(posRepartidor);
 
-                edFecha.setText(pedidoActual.getPedido().getFecha());
-                edTotal.setText(pedidoActual.getPedido().getTotal());
+                String idCotizacion =pedidoActual.getCotizacionId();
+                Cotizacion cotizacionActual= cotizacion.getById(idCotizacion);
+                int posCotizacion = listCotizaciones.indexOf(cotizacionActual);
+                spCotizcion.setSelection(posCotizacion);
+
+                edFecha.setText(pedidoActual.getFecha());
 
             }
 
@@ -323,22 +323,18 @@ public class Ppedido extends AppCompatActivity {
                     public void onClick(DialogInterface dialog, int which) {
                         int position = getLayoutPosition();
 
-                        Dpedido pedidoActual = listPedidos.get(position);
+                        Pedido pedidoActual = listPedidos.get(position);
 
-                        long positionEstado = spEstado.getSelectedItemPosition();
-                        String estadoSeleccionado = arrayEstados[(int) positionEstado];
-                        pedidoActual.getPedido().setEstado(estadoSeleccionado);
+                        Cliente clienteSeleccionado = (Cliente) spCliente.getSelectedItem();
+                        pedidoActual.setClienteId(clienteSeleccionado.getId());
 
-                        long posicionCliente = spCliente.getSelectedItemPosition();
-                        Cliente clienteSeleccionado = listClientes.get((int) posicionCliente);
-                        pedidoActual.getPedido().setClienteId(clienteSeleccionado.getId());
+                        Repartidor repartidorSeleccionado = (Repartidor) spRepartidor.getSelectedItem();
+                        pedidoActual.setRepartidorId(repartidorSeleccionado.getId());
 
-                        long posicionRepartidor = spRepartidor.getSelectedItemPosition();
-                        String repartidorId = listRepartidores.get((int) posicionRepartidor).getId();
-                        pedidoActual.getPedido().setRepartidorId(repartidorId);
+                        Cotizacion cotizacionSeleccionada = (Cotizacion) spCotizcion.getSelectedItem();
+                        pedidoActual.setCotizacionId(cotizacionSeleccionada.getId());
 
-                        pedidoActual.getPedido().setFecha(edFecha.getText().toString());
-                        pedidoActual.getPedido().setTotal(edTotal.getText().toString());
+                        pedidoActual.setFecha(edFecha.getText().toString());
 
                         pedido.updateDatos(pedidoActual);
                         listar();
@@ -363,7 +359,7 @@ public class Ppedido extends AppCompatActivity {
                     public void onClick(DialogInterface dialog, int which) {
                         int position = getLayoutPosition();
                         if (position != RecyclerView.NO_POSITION) {
-                            Dpedido pedidoActual = listPedidos.get(position);
+                            Pedido pedidoActual = listPedidos.get(position);
                             String id = pedidoActual.getId();
 
                             //eliminar pedido
@@ -385,7 +381,7 @@ public class Ppedido extends AppCompatActivity {
 
             }
 
-            private void onClickDetalles() {
+            private void detalles() {
                 Intent intento = new Intent(Ppedido.this, PdetallePedido.class);
                 int position = getLayoutPosition();
                 String pedidoId = listPedidos.get(position).getId();

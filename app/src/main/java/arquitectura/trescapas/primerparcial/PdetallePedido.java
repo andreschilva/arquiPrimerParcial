@@ -15,43 +15,54 @@ import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
+import android.widget.AdapterView;
 import android.widget.CheckBox;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import java.io.FileInputStream;
-import java.io.Serializable;
-import java.util.ArrayList;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.List;
 
-import arquitectura.trescapas.primerparcial.Negocio.Ncategoria;
 import arquitectura.trescapas.primerparcial.Negocio.Ncliente;
-import arquitectura.trescapas.primerparcial.Negocio.NdetallePedido;
+import arquitectura.trescapas.primerparcial.Negocio.Ncotizacion;
+import arquitectura.trescapas.primerparcial.Negocio.NdetalleCotizacion;
 import arquitectura.trescapas.primerparcial.Negocio.Npedido;
 import arquitectura.trescapas.primerparcial.Negocio.Nproducto;
 import arquitectura.trescapas.primerparcial.Negocio.Nrepartidor;
 import arquitectura.trescapas.primerparcial.Utils.Utils;
-import arquitectura.trescapas.primerparcial.clases.Categoria;
 import arquitectura.trescapas.primerparcial.clases.Cliente;
-import arquitectura.trescapas.primerparcial.clases.DetallePedido;
+import arquitectura.trescapas.primerparcial.clases.Cotizacion;
+import arquitectura.trescapas.primerparcial.clases.DetalleCotizacion;
 import arquitectura.trescapas.primerparcial.clases.Pedido;
 import arquitectura.trescapas.primerparcial.clases.Producto;
 import arquitectura.trescapas.primerparcial.clases.Repartidor;
+import arquitectura.trescapas.primerparcial.clases.interfaces.Negocio;
 
 public class PdetallePedido extends AppCompatActivity {
+    Spinner spDetallePCot, spCliente, spRepartidor;
+    EditText edFechaDetalleP;
+
     Pedido pedido;
-    NdetallePedido detallePedido;
-    Ncliente cliente;
+    NdetalleCotizacion detalleCotizacion;
+    Negocio cliente;
     Nrepartidor repartidor;
     Nproducto producto;
-    Ncategoria categoria;
     Npedido nPedido;
+    Cotizacion cotizacion;
+    Ncotizacion nCotizacion;
 
     List<Producto> listProductos;
-    List<Categoria> lisCategorias;
-    List<DetallePedido> listDetallePedido;
+    List<DetalleCotizacion> listDetalleCotizacion;
     List<Producto>  listProductosDelPedido;
+    List<Cliente> listClientes;
+    List<Repartidor> listRepartidores;
+    List<Cotizacion> listCotizaciones;
+
     RecyclerView rv2;
     AdaptadorProducto aP2;
 
@@ -59,20 +70,25 @@ public class PdetallePedido extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_pdetalle_pedido);
+
         nPedido = new Npedido(this);
         String pedidoId = getIntent().getStringExtra("pedido");
-        pedido= nPedido.getById(pedidoId).getPedido();
+        pedido= nPedido.getById(pedidoId);
+        nCotizacion = new Ncotizacion(this);
+        cotizacion = nCotizacion.getById(pedido.getCotizacionId());
 
         producto = new Nproducto(this);
-        categoria = new Ncategoria(this);
-        detallePedido = new NdetallePedido(this);
+        detalleCotizacion = new NdetalleCotizacion(this);
         cliente = new Ncliente(this);
         repartidor = new Nrepartidor(this);
 
         listProductos = producto.getDatos();
-        lisCategorias= categoria.getDatos();
-        listDetallePedido = detallePedido.getDatos();
-        listProductosDelPedido = getListProductosDelPedido();
+        listDetalleCotizacion = detalleCotizacion.getDatos();
+        listProductosDelPedido = detalleCotizacion.getListProductosDelPedido(cotizacion);
+
+        cargarSpinners();
+        edFechaDetalleP = findViewById(R.id.edFechaDetalleP);
+        edFechaDetalleP.setText(cotizacion.getFecha());
 
         rv2 = findViewById(R.id.rv2);
         LinearLayoutManager l=new LinearLayoutManager(this);
@@ -82,34 +98,74 @@ public class PdetallePedido extends AppCompatActivity {
 
     }
 
-    private List<Producto> getListProductosDelPedido() {
-        listDetallePedido = detallePedido.getDatos();
-        List<Producto>  resultado = new ArrayList<>();
-        for (DetallePedido pedidoActual: listDetallePedido ) {
-            String pedidoId = pedidoActual.getPedidoId();
-            if (pedidoId.equals(pedido.getId())) {
-                String productoId = pedidoActual.getProductoId();
-                String cantidad = pedidoActual.getCantidad();
-                for (Producto productoActual: listProductos ) {
-                    if (productoId.equals(productoActual.getId())) {
-                        resultado.add(productoActual);
-                        break;
-                    }
-                }
+    private void cargarSpinners() {
+        //Cotizaciones
+        spDetallePCot = findViewById(R.id.spCotizacionesDetalleP);
+        Utils.setSpinner(spDetallePCot,listCotizaciones,cotizacion.getId(),this,nCotizacion);
+
+        spDetallePCot.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                cotizacion = (Cotizacion) parent.getItemAtPosition(position);
+                listar();
             }
-        }
-        return resultado;
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+
+        //Clientes
+        spCliente = findViewById(R.id.spClienteDetalleP);
+        String idcliente = pedido.getClienteId();
+        Utils.setSpinner(spCliente,listClientes,idcliente,this,cliente);
+
+        //Repartidores
+        spRepartidor = findViewById(R.id.spRepartidorDetalleP);
+        String idRepartidor = pedido.getRepartidorId();
+        Utils.setSpinner(spRepartidor,listRepartidores,idRepartidor,this,repartidor);
+
     }
 
-    public void agregarProductos(View v) {
-        Intent intento = new Intent(PdetallePedido.this, EditarProducto.class);
-        intento.putExtra("pedido", (Serializable) pedido.getId());
-        startActivity(intento);
-        aP2.notifyDataSetChanged();
+
+    public void edit(View v) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage("Desea guardar los cambios?");
+
+        builder.setPositiveButton("Confirmar", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+                Cliente clienteSeleccionado = (Cliente) spCliente.getSelectedItem();
+                pedido.setClienteId(clienteSeleccionado.getId());
+
+                Repartidor repartidorSeleccionado = (Repartidor) spRepartidor.getSelectedItem();
+                pedido.setRepartidorId(repartidorSeleccionado.getId());
+
+                Cotizacion cotizacionSeleccionada = (Cotizacion) spDetallePCot.getSelectedItem();
+                pedido.setCotizacionId(cotizacionSeleccionada.getId());
+
+                String fechaActual = new SimpleDateFormat("dd/MM/yyyy").format(Calendar.getInstance().getTime());
+                pedido.setFecha(fechaActual);
+
+                nPedido.updateDatos(pedido);
+                listar();
+            }
+        });
+        builder.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+            }
+        });
+
+        builder.create().show();
     }
 
     public  void enviarDatosARepartidor(View v) {
-        Cliente clienteDelPedido= cliente.getById(pedido.getClienteId());
+        Cliente clienteDelPedido= (Cliente) cliente.getById(pedido.getClienteId());
         Repartidor repartidorDelPedido= repartidor.getById(pedido.getRepartidorId());
         String numeroRepartidor = repartidorDelPedido.getCelular();
         String ubicacionCliente = clienteDelPedido.getUbicacion();
@@ -146,7 +202,7 @@ public class PdetallePedido extends AppCompatActivity {
     }
 
     public void listar() {
-        this.listProductosDelPedido = getListProductosDelPedido();
+        this.listProductosDelPedido = detalleCotizacion.getListProductosDelPedido(cotizacion);
         aP2.notifyDataSetChanged();
     }
 
@@ -184,13 +240,8 @@ public class PdetallePedido extends AppCompatActivity {
                 btnEliminar = itemView.findViewById(R.id.btnEliminar);
 
                 checkBox.setVisibility(View.GONE);
-
-                btnEliminar.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        eliminar();
-                    }
-                });
+                btnEliminar.setVisibility(View.GONE);
+                edCantidad.setEnabled(false);
 
             }
 
@@ -225,7 +276,7 @@ public class PdetallePedido extends AppCompatActivity {
 
                     edNombre.setText(productoActual.getNombre());
                     edPrecio.setText(productoActual.getPrecio());
-                    edCantidad.setText(listDetallePedido.get(position).getCantidad());
+                    edCantidad.setText(Integer.toString(listDetalleCotizacion.get(position).getCantidad()));
 
                 }catch (Exception e) {
                     Utils.mensaje(PdetallePedido.this,e.getMessage());
@@ -233,36 +284,6 @@ public class PdetallePedido extends AppCompatActivity {
 
             }
 
-            private void eliminar() {
-                AlertDialog.Builder builder = new AlertDialog.Builder(PdetallePedido.this);
-                builder.setMessage("Esta seguro que desea Eliminar este producto?");
-
-                builder.setPositiveButton("Confirmar", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        int position = getLayoutPosition();
-                        if (position != RecyclerView.NO_POSITION) {
-                            DetallePedido detallePedidoActual = listDetallePedido.get(position);
-                            String id = detallePedidoActual.getId();
-
-                            //eliminar detalle del pedido
-                            detallePedido.delete(id);
-                            listar();
-                        }
-
-                    }
-                });
-
-                builder.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-
-                    }
-                });
-
-                builder.create().show();
-
-            }
         }
     }
 }

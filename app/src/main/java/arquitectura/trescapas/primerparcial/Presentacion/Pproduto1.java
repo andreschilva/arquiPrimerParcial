@@ -57,7 +57,7 @@ public class Pproduto1 extends AppCompatActivity{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_pproduto);
 
-        tvNumero = findViewById(R.id.tvnumero1);
+//        tvNumero = findViewById(R.id.tvnumero1);
 //
 //        producto = new Nproducto(this);
 //        categoria = new Ncategoria(this);

@@ -1,10 +1,11 @@
-package arquitectura.trescapas.primerparcial.clases;
+package arquitectura.trescapas.primerparcial.clases.patrones.estado;
 
 import android.content.Context;
 
 import arquitectura.trescapas.primerparcial.Datos.Dpedido;
 import arquitectura.trescapas.primerparcial.Utils.Utils;
-import arquitectura.trescapas.primerparcial.interfaces.Estado;
+import arquitectura.trescapas.primerparcial.clases.Pedido;
+import arquitectura.trescapas.primerparcial.clases.interfaces.Estado;
 
 public class EstadoFinalizado implements Estado {
     private Dpedido dPedido;
@@ -28,18 +29,26 @@ public class EstadoFinalizado implements Estado {
 
     @Override
     public void cancelado() {
-        Utils.mensaje(context, "no se puede Cancelar el pedido");
+        Utils.mensaje(context, "no se puede Cancelar el pedido en este estado");
     }
 
     @Override
-    public Boolean update(Dpedido data) {
-        Utils.mensaje(context, "no se puede Actualizar el pedido");
+    public Boolean update(Pedido data) {
+        Utils.mensaje(context, "no se puede Actualizar el pedido en este estado");
         return false;
     }
 
     @Override
     public Boolean delete(String id) {
-        Utils.mensaje(context, "no se puede Eliminar el pedido");
+        try {
+            String[] wereArgs = {id};
+            this.dPedido.open();
+            int resultado = this.dPedido.getBasededatos().delete(this.dPedido.getTabla(), "id = ?", wereArgs);
+            this.dPedido.close();
+            return resultado > 0;
+        }catch (Exception e) {
+            System.out.println("error al eliminar los datos" + e.getMessage());
+        }
         return false;
     }
 }

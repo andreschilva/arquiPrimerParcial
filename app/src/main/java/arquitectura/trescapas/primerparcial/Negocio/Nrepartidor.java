@@ -7,8 +7,9 @@ import java.util.List;
 
 import arquitectura.trescapas.primerparcial.Datos.Drepartidor;
 import arquitectura.trescapas.primerparcial.clases.Repartidor;
+import arquitectura.trescapas.primerparcial.clases.interfaces.Negocio;
 
-public class Nrepartidor {
+public class Nrepartidor implements Negocio<Repartidor> {
 
     private Drepartidor drepartidor;
     Context context;

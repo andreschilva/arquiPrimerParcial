@@ -31,7 +31,9 @@ public class DBconexion extends SQLiteOpenHelper {
 
         sqLiteDatabase.execSQL(DBmigrations.TABLA_PEDIDO_CREATE);
 
-        sqLiteDatabase.execSQL(DBmigrations.TABLA_DETALLE_PEDIDO_CREATE);
+        sqLiteDatabase.execSQL(DBmigrations.TABLA_COTIZACION_CREATE);
+
+        sqLiteDatabase.execSQL(DBmigrations.TABLA_DETALLE_COTIZACION_CREATE);
 
     }
 
@@ -44,7 +46,8 @@ public class DBconexion extends SQLiteOpenHelper {
         sqLiteDatabase.execSQL( "DROP TABLE IF EXISTS "+ DBmigrations.TABLA_CATEGORIA );
         sqLiteDatabase.execSQL( "DROP TABLE IF EXISTS "+ DBmigrations.TABLA_PRODUCTO );
         sqLiteDatabase.execSQL( "DROP TABLE IF EXISTS "+ DBmigrations.TABLA_PEDIDO_CREATE );
-        sqLiteDatabase.execSQL( "DROP TABLE IF EXISTS "+ DBmigrations.TABLA_DETALLE_PEDIDO_CREATE );
+        sqLiteDatabase.execSQL( "DROP TABLE IF EXISTS "+ DBmigrations.TABLA_COTIZACION_CREATE );
+        sqLiteDatabase.execSQL( "DROP TABLE IF EXISTS "+ DBmigrations.TABLA_DETALLE_COTIZACION_CREATE );
 
     }
 }

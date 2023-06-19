@@ -1,4 +1,4 @@
-package arquitectura.trescapas.primerparcial;
+package arquitectura.trescapas.primerparcial.Presentacion;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -19,38 +19,42 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.io.FileInputStream;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 import arquitectura.trescapas.primerparcial.Negocio.Ncategoria;
-import arquitectura.trescapas.primerparcial.Negocio.NdetallePedido;
+import arquitectura.trescapas.primerparcial.Negocio.Ncotizacion;
+import arquitectura.trescapas.primerparcial.Negocio.NdetalleCotizacion;
 import arquitectura.trescapas.primerparcial.Negocio.Nproducto;
+import arquitectura.trescapas.primerparcial.R;
 import arquitectura.trescapas.primerparcial.Utils.Utils;
-import arquitectura.trescapas.primerparcial.clases.DetallePedido;
+import arquitectura.trescapas.primerparcial.clases.Cotizacion;
+import arquitectura.trescapas.primerparcial.clases.DetalleCotizacion;
 import arquitectura.trescapas.primerparcial.clases.Producto;
 
-public class EditarProducto extends AppCompatActivity {
+public class PseleccionarProductos extends AppCompatActivity {
 
     RecyclerView rv1;
     AdaptadorProducto aP;
     Nproducto producto;
-    Ncategoria categoria;
     List<Producto> listProductos;
     List<Producto> listProductosSeleccionados;
     List<String> listCantidades;
-    String pedidoId;
-    NdetallePedido ndetallePedido;
+    String cotizacionId;
+    NdetalleCotizacion nDetalleCotizacion;
+    Ncotizacion ncotizacion;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_editar_producto);
+        setContentView(R.layout.activity_pseleccionar_productos);
 
-        pedidoId = getIntent().getStringExtra("pedido");
-        //Utils.mensaje(this,pedidoId);
+        cotizacionId = getIntent().getStringExtra("cotizacion");
+        ncotizacion = new Ncotizacion(this);
+        //Utils.mensaje(this,cotizacionId);
         producto = new Nproducto(this);
-        ndetallePedido = new NdetallePedido(this);
+        nDetalleCotizacion = new NdetalleCotizacion(this);
         listProductos = producto.getDatos();
         listProductosSeleccionados = new ArrayList<>();
         listCantidades = new ArrayList<>();
@@ -63,18 +67,23 @@ public class EditarProducto extends AppCompatActivity {
     }
 
     public void agregarProductos(View v) {
+        Cotizacion cotizacion = ncotizacion.getById(cotizacionId);
+
+        float total = cotizacion.getTotal();
         for (int i = 0; i < listProductosSeleccionados.size();i++) {
             Producto productoActual = listProductosSeleccionados.get(i);
-            String cantidadActual = listCantidades.get(i);
+            int cantidadActual = Integer.parseInt(listCantidades.get(i));
 
-            DetallePedido detallePedido = new DetallePedido("",cantidadActual,pedidoId,productoActual.getId());
-            ndetallePedido.saveDatos(detallePedido);
-
+            DetalleCotizacion detalleCotizacion = new DetalleCotizacion("", productoActual.getId(),cotizacionId,cantidadActual);
+            nDetalleCotizacion.saveDatos(detalleCotizacion);
+             total +=(cantidadActual * Integer.parseInt(productoActual.getPrecio()));
         }
-        Intent intento = new Intent(EditarProducto.this, PdetallePedido.class);
-        intento.putExtra("pedido", (Serializable) pedidoId);
+        cotizacion.setTotal(total);
+        ncotizacion.updateDatos(cotizacion);
+
+        Intent resultIntent = new Intent();
+        setResult(RESULT_OK, resultIntent);
         finish();
-        startActivity(intento);
     }
 
     public void cancelar(View v) {
@@ -158,7 +167,7 @@ public class EditarProducto extends AppCompatActivity {
                     edPrecio.setText(productoActual.getPrecio());
 
                 }catch (Exception e) {
-                    Utils.mensaje(EditarProducto.this,e.getMessage());
+                    Utils.mensaje(PseleccionarProductos.this,e.getMessage());
                 }
 
             }

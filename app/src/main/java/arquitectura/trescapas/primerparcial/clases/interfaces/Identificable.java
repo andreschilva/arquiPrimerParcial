@@ -1,4 +1,4 @@
-package arquitectura.trescapas.primerparcial.interfaces;
+package arquitectura.trescapas.primerparcial.clases.interfaces;
 
 public interface Identificable {
     String getId();

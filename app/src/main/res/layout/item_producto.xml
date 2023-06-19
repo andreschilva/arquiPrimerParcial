@@ -61,43 +61,6 @@
             app:layout_constraintTop_toBottomOf="@+id/edPrecioP"
             tools:targetApi="lollipop" />
 
-        <CheckBox
-            android:id="@+id/cBProductos"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="4dp"
-            android:layout_marginLeft="4dp"
-            android:layout_marginTop="8dp"
-            android:focusableInTouchMode="false"
-            android:text="Cotizar"
-            android:textSize="18sp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.013"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/edCategoriaP" />
-
-        <EditText
-            android:id="@+id/edCantidad"
-            android:layout_width="92dp"
-            android:layout_height="44dp"
-            android:layout_marginStart="4dp"
-            android:layout_marginLeft="4dp"
-            android:layout_marginTop="4dp"
-            android:layout_marginEnd="4dp"
-            android:layout_marginRight="4dp"
-            android:layout_marginBottom="4dp"
-            android:ems="10"
-            android:focusableInTouchMode="true"
-            android:hint="cantidad"
-            android:inputType="number"
-            android:textSize="18sp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/btnEdit"
-            app:layout_constraintHorizontal_bias="0.022"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/cBProductos"
-            app:layout_constraintVertical_bias="0.25" />
-
         <EditText
             android:id="@+id/edNombreP"
             android:layout_width="0dp"
@@ -110,11 +73,11 @@
             android:textSize="18sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/tvNombreU"
-            app:layout_constraintTop_toBottomOf="@+id/iv1" />
+            app:layout_constraintTop_toBottomOf="@+id/btnFotoUsuario" />
 
 
         <ImageButton
-            android:id="@+id/iv1"
+            android:id="@+id/btnFotoUsuario"
             android:layout_width="0dp"
             android:layout_height="239dp"
             android:background="@drawable/imagen"
@@ -134,7 +97,7 @@
             android:textSize="18sp"
             android:textStyle="bold"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/iv1" />
+            app:layout_constraintTop_toBottomOf="@+id/btnFotoUsuario" />
 
         <TextView
             android:id="@+id/tvApellidoU"
@@ -186,22 +149,25 @@
             android:background="@android:color/transparent"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/cBProductos"
+            app:layout_constraintTop_toBottomOf="@+id/edCategoriaP"
+            app:layout_constraintVertical_bias="0.207"
             app:srcCompat="@drawable/eliminar2" />
 
         <ImageButton
             android:id="@+id/btnEdit"
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
-            android:layout_marginEnd="16dp"
-            android:layout_marginRight="16dp"
+            android:layout_marginEnd="48dp"
+            android:layout_marginRight="48dp"
             android:layout_marginBottom="4dp"
             android:background="@android:color/transparent"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/btnEliminar"
-            app:layout_constraintTop_toBottomOf="@+id/cBProductos"
-            app:layout_constraintVertical_bias="0.2"
+            app:layout_constraintHorizontal_bias="0.969"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/edCategoriaP"
+            app:layout_constraintVertical_bias="1.0"
             app:srcCompat="@drawable/guardar" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>

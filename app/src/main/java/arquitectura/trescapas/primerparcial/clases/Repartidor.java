@@ -16,13 +16,14 @@ public class Repartidor extends Persona{
         }
     }
 
-    public static Repartidor crear(String id, String nom, String ape, String cel, String placa){
+    public static Repartidor crear(String id, String nom, String ape, String cel, String placa, String foto){
         Repartidor repartidor = new Repartidor();
         repartidor.setId(id);
         repartidor.setNombre(nom);
         repartidor.setApellido(ape);
         repartidor.setCelular(cel);
         repartidor.setPlaca(placa);
+        repartidor.setFoto(foto);
         return repartidor;
     }
 
